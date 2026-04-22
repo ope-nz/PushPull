@@ -29,7 +29,12 @@ namespace GFD
 
         void WireEvents()
         {
-            this.Load += (s, e) => { SetButtonStates(); if (_currentProject != null) DoRefresh(); };
+            this.Load += (s, e) =>
+            {
+                splitContainer.SplitterDistance = splitContainer.Width / 2;
+                SetButtonStates();
+                if (_currentProject != null) DoRefresh();
+            };
             menuNewProject.Click += (s, e) => EditProject(null);
             menuEditProject.Click += (s, e) => EditProject(_currentProject);
             menuRemoveProject.Click += (s, e) => RemoveCurrentProject();
