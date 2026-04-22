@@ -85,8 +85,8 @@ namespace PushPull
             this.btnPullAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.btnRefresh, this.toolSep1,
-                this.btnPushSelected, this.btnPullSelected,
-                this.toolSep2, this.btnPushAll, this.btnPullAll });
+                this.btnPushSelected, this.btnPushAll,
+                this.toolSep2, this.btnPullSelected, this.btnPullAll });
 
             // topPanel
             this.topPanel.Height = 32;
