@@ -28,6 +28,10 @@ namespace PushPull
         public string Token { get; set; }
         public string LastProjectName { get; set; }
         public List<GfdProject> Projects { get; set; }
+        public int WindowX { get; set; }
+        public int WindowY { get; set; }
+        public int WindowWidth { get; set; }
+        public int WindowHeight { get; set; }
 
         public GfdConfig() { Projects = new List<GfdProject>(); }
     }
