@@ -85,9 +85,25 @@ obj/
 .vs/
 ```
 
+## Command Line
+
+You can push all changed files for a project without opening the UI:
+
+```
+PushPull.exe "MyProject"
+```
+
+Replace `MyProject` with the name you gave the project in the app. The exit code is `0` on success and `1` if the project was not found or all uploads failed. Output goes to the calling terminal, making it easy to use in scripts or scheduled tasks.
+
+## Portable Mode
+
+If a `config.json` file exists in the same folder as `PushPull.exe`, it is used instead of `%APPDATA%\PushPull\config.json`. This lets you carry the app and its settings together on a USB drive or in a synced folder.
+
+To switch an existing install to portable mode, copy `%APPDATA%\PushPull\config.json` next to the exe.
+
 ## Config File
 
-Settings and project definitions are stored at:
+By default, settings and project definitions are stored at:
 
 ```
 %APPDATA%\PushPull\config.json
