@@ -31,10 +31,12 @@ namespace PushPull
         {
             this.Load += (s, e) =>
             {
+                RestoreWindowBounds();
                 splitContainer.SplitterDistance = splitContainer.Width / 2;
                 SetButtonStates();
                 if (_currentProject != null) DoRefresh();
             };
+            this.FormClosing += (s, e) => SaveWindowBounds();
             menuNewProject.Click += (s, e) => EditProject(null);
             menuEditProject.Click += (s, e) => EditProject(_currentProject);
             menuRemoveProject.Click += (s, e) => RemoveCurrentProject();
@@ -382,6 +384,31 @@ default: return "";
                 ConfigManager.Save(_config);
                 _currentProject = null;
                 RefreshProjectCombo();
+            }
+        }
+
+        void SaveWindowBounds()
+        {
+            if (WindowState == FormWindowState.Normal)
+            {
+                _config.WindowX = Location.X;
+                _config.WindowY = Location.Y;
+                _config.WindowWidth = Width;
+                _config.WindowHeight = Height;
+                ConfigManager.Save(_config);
+            }
+        }
+
+        void RestoreWindowBounds()
+        {
+            if (_config.WindowWidth > 0 && _config.WindowHeight > 0)
+            {
+                var bounds = new System.Drawing.Rectangle(_config.WindowX, _config.WindowY, _config.WindowWidth, _config.WindowHeight);
+                if (System.Windows.Forms.Screen.FromRectangle(bounds).WorkingArea.IntersectsWith(bounds))
+                {
+                    Location = bounds.Location;
+                    Size = bounds.Size;
+                }
             }
         }
 
