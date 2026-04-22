@@ -2,7 +2,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace GFD
+namespace PushPull
 {
     static class AppIcon
     {
