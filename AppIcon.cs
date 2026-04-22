@@ -1,4 +1,4 @@
-using System.IO;
+using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -6,16 +6,12 @@ namespace GFD
 {
     static class AppIcon
     {
-        static System.Drawing.Icon _icon;
+        static Icon _icon;
 
-        static System.Drawing.Icon Load()
+        static Icon Load()
         {
             if (_icon != null) return _icon;
-            string path = Path.Combine(
-                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                "icon.ico");
-            if (File.Exists(path))
-                _icon = new System.Drawing.Icon(path);
+            _icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
             return _icon;
         }
 
