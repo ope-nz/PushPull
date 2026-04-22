@@ -40,6 +40,8 @@ namespace PushPull
             menuNewProject.Click += (s, e) => EditProject(null);
             menuEditProject.Click += (s, e) => EditProject(_currentProject);
             menuRemoveProject.Click += (s, e) => RemoveCurrentProject();
+            menuDeleteRemoteSelected.Click += (s, e) => DeleteRemoteSelected();
+            menuDeleteAllRemote.Click += (s, e) => DeleteAllRemote();
             menuExit.Click += (s, e) => Close();
             menuSettings.Click += (s, e) => ShowSettings();
             menuAbout.Click += (s, e) => MessageBox.Show("PushPull for GitHub", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -122,6 +124,8 @@ namespace PushPull
             btnPullAll.Enabled = hasProject && hasToken;
             menuEditProject.Enabled = hasProject;
             menuRemoveProject.Enabled = hasProject;
+            menuDeleteRemoteSelected.Enabled = hasProject && hasToken;
+            menuDeleteAllRemote.Enabled = hasProject && hasToken;
         }
 
         void DoRefresh()
@@ -288,6 +292,54 @@ default: return "";
             var toSync = _entries.FindAll(e => e.Status == SyncStatus.RemoteNewer || e.Status == SyncStatus.RemoteOnly);
             if (toSync.Count == 0) { MessageBox.Show("Nothing to pull."); return; }
             RunSync(toSync, push: false);
+        }
+
+        void DeleteRemoteSelected()
+        {
+            var toDelete = GetSelectedEntries(listRemote).FindAll(e => e.ExistsRemotely);
+            if (toDelete.Count == 0) { MessageBox.Show("Select remote files to delete.", "Delete Remote"); return; }
+            string msg = string.Format("Delete {0} file(s) from GitHub? This cannot be undone.", toDelete.Count);
+            if (MessageBox.Show(msg, "Delete Remote Files", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            RunDeleteRemote(toDelete);
+        }
+
+        void DeleteAllRemote()
+        {
+            var toDelete = _entries.FindAll(e => e.ExistsRemotely);
+            if (toDelete.Count == 0) { MessageBox.Show("No remote files to delete."); return; }
+            string msg = string.Format("Delete ALL {0} remote file(s) from GitHub? This cannot be undone.", toDelete.Count);
+            if (MessageBox.Show(msg, "Delete All Remote Files", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            RunDeleteRemote(toDelete);
+        }
+
+        void RunDeleteRemote(List<FileEntry> entries)
+        {
+            var project = _currentProject;
+            var token = _config.Token;
+            int done = 0, failed = 0;
+
+            SetStatus("Deleting " + entries.Count + " remote file(s)...");
+            Cursor = Cursors.WaitCursor;
+            SetAllButtons(false);
+
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                foreach (var e in entries)
+                {
+                    if (GitHub.DeleteFile(token, project.Owner, project.Repo, project.Branch, e.RelativePath, e.RemoteSha))
+                        done++;
+                    else
+                        failed++;
+                }
+
+                Invoke((Action)(() =>
+                {
+                    Cursor = Cursors.Default;
+                    SetAllButtons(true);
+                    SetStatus(string.Format("Delete complete. {0} deleted, {1} failed.", done, failed));
+                    DoRefresh();
+                }));
+            });
         }
 
         List<FileEntry> GetSelectedEntries(ListView lv)
