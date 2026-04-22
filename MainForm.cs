@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace GFD
+namespace PushPull
 {
     public partial class MainForm : Form
     {
@@ -40,6 +40,7 @@ namespace GFD
             menuRemoveProject.Click += (s, e) => RemoveCurrentProject();
             menuExit.Click += (s, e) => Close();
             menuSettings.Click += (s, e) => ShowSettings();
+            menuAbout.Click += (s, e) => MessageBox.Show("PushPull for GitHub", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
             btnRefresh.Click += (s, e) => DoRefresh();
             btnPushSelected.Click += (s, e) => PushSelected();
             btnPullSelected.Click += (s, e) => PullSelected();
@@ -304,6 +305,7 @@ namespace GFD
                     }
                     ConfigManager.Save(_config);
                     RefreshProjectCombo();
+                    DoRefresh();
                 }
             }
         }
