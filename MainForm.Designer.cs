@@ -51,6 +51,11 @@ namespace PushPull
             this.colRemoteSha = new System.Windows.Forms.ColumnHeader();
             this.colRemoteStatus = new System.Windows.Forms.ColumnHeader();
 
+            this.contextMenuLocal = new System.Windows.Forms.ContextMenuStrip();
+            this.menuPushFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuRemote = new System.Windows.Forms.ContextMenuStrip();
+            this.menuPullFolder = new System.Windows.Forms.ToolStripMenuItem();
+
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 
@@ -111,7 +116,7 @@ namespace PushPull
             this.lblLocal.Font = new System.Drawing.Font("Segoe UI", 9f, System.Drawing.FontStyle.Bold);
             this.lblLocal.Height = 20;
             this.colLocalName.Text = "Name";
-            this.colLocalName.Width = 200;
+            this.colLocalName.Width = 280;
             this.colLocalSize.Text = "Size";
             this.colLocalSize.Width = 70;
             this.colLocalModified.Text = "Modified";
@@ -124,8 +129,12 @@ namespace PushPull
             this.listLocal.FullRowSelect = true;
             this.listLocal.GridLines = true;
             this.listLocal.HideSelection = false;
+            this.listLocal.ShowGroups = true;
             this.listLocal.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listLocal.OwnerDraw = false;
+            this.contextMenuLocal.Items.Add(this.menuPushFolder);
+            this.menuPushFolder.Text = "Push Folder";
+            this.listLocal.ContextMenuStrip = this.contextMenuLocal;
             this.splitContainer.Panel1.Controls.Add(this.listLocal);
             this.splitContainer.Panel1.Controls.Add(this.lblLocal);
 
@@ -135,7 +144,7 @@ namespace PushPull
             this.lblRemote.Font = new System.Drawing.Font("Segoe UI", 9f, System.Drawing.FontStyle.Bold);
             this.lblRemote.Height = 20;
             this.colRemoteName.Text = "Name";
-            this.colRemoteName.Width = 200;
+            this.colRemoteName.Width = 280;
             this.colRemoteSize.Text = "Size";
             this.colRemoteSize.Width = 70;
             this.colRemoteSha.Text = "SHA";
@@ -148,7 +157,11 @@ namespace PushPull
             this.listRemote.FullRowSelect = true;
             this.listRemote.GridLines = true;
             this.listRemote.HideSelection = false;
+            this.listRemote.ShowGroups = true;
             this.listRemote.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.contextMenuRemote.Items.Add(this.menuPullFolder);
+            this.menuPullFolder.Text = "Pull Folder";
+            this.listRemote.ContextMenuStrip = this.contextMenuRemote;
             this.splitContainer.Panel2.Controls.Add(this.listRemote);
             this.splitContainer.Panel2.Controls.Add(this.lblRemote);
 
@@ -207,6 +220,10 @@ namespace PushPull
         private System.Windows.Forms.ColumnHeader colRemoteSize;
         private System.Windows.Forms.ColumnHeader colRemoteSha;
         private System.Windows.Forms.ColumnHeader colRemoteStatus;
+        private System.Windows.Forms.ContextMenuStrip contextMenuLocal;
+        private System.Windows.Forms.ToolStripMenuItem menuPushFolder;
+        private System.Windows.Forms.ContextMenuStrip contextMenuRemote;
+        private System.Windows.Forms.ToolStripMenuItem menuPullFolder;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
     }
