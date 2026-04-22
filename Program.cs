@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Windows.Forms;
 
-namespace GFD
+namespace PushPull
 {
     static class Program
     {
