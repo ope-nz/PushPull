@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web.Script.Serialization;
 
-namespace GFD
+namespace PushPull
 {
     public class GfdProject
     {
@@ -39,7 +39,7 @@ namespace GFD
             get
             {
                 string dir = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GFD");
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PushPull");
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 return Path.Combine(dir, "config.json");
             }
