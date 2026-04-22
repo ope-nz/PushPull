@@ -1,23 +1,25 @@
-# GFD - GitHub for Dummies: Implementation Plan
+# PushPull - GitHub for Dummies: Implementation Plan
 
 ## Project Setup
 
-- [x] Create `GFD` directory structure with `MainForm.cs`, `MainForm.Designer.cs`, `Program.cs`, source files, and `_compile.bat`
+- [x] Create `PushPull` directory structure with `MainForm.cs`, `MainForm.Designer.cs`, `Program.cs`, source files, and `_compile.bat`
 - [x] Set up `_compile.bat` using `csc.exe /target:winexe` referencing `System.Windows.Forms`, `System.Drawing`, `System.Net`, etc.
 - [x] Port `github.cs` from `b4x_custom_actions` as the starting point for GitHub API logic (kept `JavaScriptSerializer` from `System.Web.Extensions`)
-- [ ] Add `icon.ico` and wire it up in the compile script
+- [x] Add `icon.ico`: embedded in exe via `/win32icon`, applied to all dialogs at runtime via `AppIcon.cs`
 
 ## Data / Config Layer
 
 - [x] Define a `GfdProject` model: local folder path, GitHub owner, repo name, branch, ignore patterns
-- [x] Store projects in a JSON config file (`%APPDATA%\GFD\config.json`)
+- [x] Store projects in a JSON config file (`%APPDATA%\PushPull\config.json`)
 - [x] Store the GitHub auth token separately in config (not in project entries)
 - [x] `ConfigManager.cs` with load/save methods
+- [x] `LastProjectName` persisted in config, restored on startup
 
 ## GitHub API Layer (`GitHub.cs`)
 
-- [x] Namespace `GFD`
+- [x] Namespace `PushPull`
 - [x] `GetRepoTree`: uses `/git/trees/{sha}?recursive=1` for a flat file list with SHA and size in one request
+- [x] Handles empty repos gracefully (404 on branch = no commits yet, returns empty remote index)
 - [x] `DownloadFile`: fetches raw content via `application/vnd.github.v3.raw`
 - [x] `UploadFile`, `DeleteFile`, `CalcLocalSha` (Git blob SHA1 matching GitHub's format)
 - [x] `GetBranches`
@@ -34,16 +36,16 @@
 
 ### Layout (WinSCP-style dual-pane)
 
-- [x] `SplitContainer` as the main layout
+- [x] `SplitContainer` as the main layout, defaulting to 50/50
 - [x] Left pane: local `ListView` (Name, Size, Modified, Status)
 - [x] Right pane: remote `ListView` (Name, Size, SHA, Status)
 - [x] Status bar showing current operation
 - [x] Toolbar: Refresh, Push Selected, Pull Selected, Push All, Pull All
 - [x] Project `ComboBox` at the top
 
-### Status colour coding
+### Status color coding
 
-- [x] Same: default colour
+- [x] Same: default color
 - [x] Local newer / local only: green highlight
 - [x] Remote newer / remote only: blue highlight
 
@@ -56,6 +58,7 @@
 - [x] New Project dialog: local folder (Browse button), owner, repo, branch (with Load Branches), ignore patterns
 - [x] Edit Project dialog
 - [x] Remove Project menu item
+- [x] Enter key in ignore field inserts newline (does not close dialog)
 
 ### Settings dialog
 
@@ -67,6 +70,11 @@
 - [x] File: New Project, Edit Project, Remove Project, Exit
 - [x] Tools: Settings
 - [ ] Help: About
+
+## Startup Behavior
+
+- [x] Restores last used project on launch
+- [x] Auto-refreshes (fetches remote) on launch if a project is loaded
 
 ## Sync Workflow (UI-driven)
 
@@ -80,7 +88,6 @@
 
 ## Still To Do
 
-- [ ] Add `icon.ico`
 - [ ] Delete remote file action (right-click context menu or toolbar button)
 - [ ] Conflict status color (orange) for files that differ but direction is ambiguous
 - [ ] Rate-limit feedback in the status bar
