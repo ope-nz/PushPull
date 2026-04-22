@@ -9,11 +9,14 @@ A simple Windows desktop app for syncing a local folder with a GitHub repository
 - Connect to GitHub using a personal access token (no Git required)
 - Register multiple projects, each linking a local folder to a GitHub repo
 - Side-by-side file browser showing local and remote files (inspired by WinSCP)
+- Files grouped by folder, with full relative paths shown for easy navigation
 - Color-coded status: see at a glance which files are newer locally, newer on GitHub, or only exist on one side
-- Push individual files or all changed files to GitHub
-- Pull individual files or all changed files from GitHub
+- Push or pull individual files, all changed files, or all files in a folder (right-click)
+- Delete selected or all remote files via the Remote menu
 - Click column headers to sort by name or date
-- Restores your last project and refreshes automatically on startup
+- Flexible ignore patterns: wildcards, file extensions, and folder names
+- Restores your last project, window position, and size on startup
+- Command line support for scripted or automated pushes
 
 ## Requirements
 
@@ -36,7 +39,7 @@ No installer. Just download `PushPull.exe` and run it.
 
 ### 2. Enter your token
 
-Open PushPull, go to **Tools > Settings**, paste your token and click **Test Connection** to verify it works.
+Open PushPull, go to **Options > Settings**, paste your token and click **Test Connection** to verify it works.
 
 ### 3. Add a project
 
@@ -69,20 +72,44 @@ Use the toolbar buttons to sync:
 |---|---|
 | **Refresh** | Re-compare local and remote |
 | **Push Selected** | Upload files selected in the left pane |
-| **Pull Selected** | Download files selected in the right pane |
 | **Push All** | Upload all local-only and locally-changed files |
+| **Pull Selected** | Download files selected in the right pane |
 | **Pull All** | Download all remote-only and remotely-changed files |
+
+Right-click any file to get a **Push Folder** or **Pull Folder** option, which syncs all changed files in that folder only.
+
+## Deleting Remote Files
+
+Use the **Remote** menu to delete files from GitHub:
+
+| Option | Action |
+|---|---|
+| **Delete Selected Remote Files...** | Deletes the files selected in the remote pane |
+| **Delete All Remote Files...** | Deletes every file in the repository for the current project |
+
+Both options prompt for confirmation before making any changes.
 
 ## Ignore Patterns
 
-In the project settings, you can list patterns to exclude from the comparison. One entry per line. Examples:
+In the project settings, list patterns to exclude from the comparison, one per line. Ignored files and folders are hidden from both panes.
+
+| Pattern | Matches |
+|---|---|
+| `*.exe` | Any file with that extension |
+| `bin` | Any folder named `bin`, at any depth |
+| `bin/` | Same, explicit folder syntax |
+| `.vs/` | The `.vs` folder |
+
+Examples:
 
 ```
 *.exe
 *.dll
-bin/
-obj/
-.vs/
+*.pdb
+bin
+obj
+.vs
+node_modules
 ```
 
 ## Command Line
