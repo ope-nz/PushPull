@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace GFD
@@ -20,6 +21,7 @@ namespace GFD
             _config = config;
             _original = existing;
             BuildUI();
+            AppIcon.Apply(this);
             if (existing != null) Populate(existing);
         }
 
@@ -59,6 +61,7 @@ namespace GFD
                 Width = tw,
                 Height = 70,
                 Multiline = true,
+                AcceptsReturn = true,
                 ScrollBars = ScrollBars.Vertical
             };
             this.Controls.Add(lblIgnore);
