@@ -110,6 +110,7 @@ namespace PushPull
                 lblLocal.Text = "Local: " + _currentProject.LocalFolder;
                 _config.LastProjectName = _currentProject.ToString();
                 ConfigManager.Save(_config);
+                DoRefresh();
             }
         }
 
