@@ -1,4 +1,4 @@
-namespace GFD
+namespace PushPull
 {
     partial class MainForm
     {
@@ -21,6 +21,8 @@ namespace GFD
             this.menuExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuTools = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSettings = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAbout = new System.Windows.Forms.ToolStripMenuItem();
 
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.btnRefresh = new System.Windows.Forms.ToolStripButton();
@@ -54,7 +56,7 @@ namespace GFD
 
             // menuStrip
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.menuFile, this.menuTools });
+                this.menuFile, this.menuTools, this.menuHelp });
             this.menuFile.Text = "&File";
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.menuNewProject, this.menuEditProject, this.menuRemoveProject,
@@ -66,6 +68,9 @@ namespace GFD
             this.menuTools.Text = "&Tools";
             this.menuTools.DropDownItems.Add(this.menuSettings);
             this.menuSettings.Text = "&Settings...";
+            this.menuHelp.Text = "&Help";
+            this.menuHelp.DropDownItems.Add(this.menuAbout);
+            this.menuAbout.Text = "&About...";
 
             // toolStrip
             this.btnRefresh.Text = "Refresh";
@@ -157,7 +162,7 @@ namespace GFD
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1000, 620);
-            this.Text = "GFD - GitHub for Dummies";
+            this.Text = "PushPull for GitHub";
             this.Controls.Add(this.splitContainer);
             this.Controls.Add(this.topPanel);
             this.Controls.Add(this.toolStrip);
@@ -176,6 +181,8 @@ namespace GFD
         private System.Windows.Forms.ToolStripMenuItem menuExit;
         private System.Windows.Forms.ToolStripMenuItem menuTools;
         private System.Windows.Forms.ToolStripMenuItem menuSettings;
+        private System.Windows.Forms.ToolStripMenuItem menuHelp;
+        private System.Windows.Forms.ToolStripMenuItem menuAbout;
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.ToolStripButton btnRefresh;
         private System.Windows.Forms.ToolStripSeparator toolSep1;
