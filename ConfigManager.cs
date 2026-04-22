@@ -34,15 +34,18 @@ namespace PushPull
 
     public static class ConfigManager
     {
-        static string ConfigPath
+        static readonly string ConfigPath = ResolveConfigPath();
+
+        static string ResolveConfigPath()
         {
-            get
-            {
-                string dir = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PushPull");
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                return Path.Combine(dir, "config.json");
-            }
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;
+            string portable = Path.Combine(appDir, "config.json");
+            if (File.Exists(portable)) return portable;
+
+            string roaming = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PushPull");
+            if (!Directory.Exists(roaming)) Directory.CreateDirectory(roaming);
+            return Path.Combine(roaming, "config.json");
         }
 
         public static GfdConfig Load()
