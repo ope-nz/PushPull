@@ -12,6 +12,7 @@ namespace GFD
         {
             _config = config;
             BuildUI();
+            AppIcon.Apply(this);
         }
 
         void BuildUI()
