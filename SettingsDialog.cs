@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace GFD
+namespace PushPull
 {
     public class SettingsDialog : Form
     {
@@ -57,7 +57,7 @@ namespace GFD
             {
                 var req = (System.Net.HttpWebRequest)System.Net.WebRequest.Create("https://api.github.com/user");
                 req.Headers.Add("Authorization", "token " + token);
-                req.UserAgent = "GFD-app";
+                req.UserAgent = "PushPull-app";
                 req.Timeout = 10000;
                 var resp = (System.Net.HttpWebResponse)req.GetResponse();
                 resp.Close();
