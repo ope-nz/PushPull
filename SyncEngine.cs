@@ -26,7 +26,9 @@ namespace PushPull
         public int RemoteSize { get; set; }
         public SyncStatus Status { get; set; }
 
-        public string DisplayName
+        public string DisplayName { get { return RelativePath; } }
+
+        public string FileName
         {
             get
             {
@@ -44,10 +46,10 @@ namespace PushPull
         {
             var entries = new Dictionary<string, FileEntry>(StringComparer.OrdinalIgnoreCase);
 
-            // Walk local files
+            // Walk local files, skipping ignored directories early
             if (Directory.Exists(project.LocalFolder))
             {
-                foreach (string abs in GetFilesRecursively(project.LocalFolder))
+                foreach (string abs in GetFilesRecursively(project.LocalFolder, project.LocalFolder, project.IgnorePatterns))
                 {
                     string rel = abs.Substring(project.LocalFolder.Length)
                         .TrimStart('\\', '/').Replace('\\', '/');
@@ -55,15 +57,13 @@ namespace PushPull
                     if (ShouldIgnore(rel, project.IgnorePatterns)) continue;
 
                     var info = new FileInfo(abs);
-                    string sha = GitHub.CalcLocalSha(abs);
-
                     entries[rel] = new FileEntry
                     {
                         RelativePath = rel,
                         ExistsLocally = true,
                         LocalModified = info.LastWriteTime,
                         LocalSize = info.Length,
-                        LocalSha = sha
+                        LocalSha = GitHub.CalcLocalSha(abs)
                     };
                 }
             }
@@ -110,13 +110,45 @@ namespace PushPull
             return list;
         }
 
-        static IEnumerable<string> GetFilesRecursively(string folder)
+        static IEnumerable<string> GetFilesRecursively(string folder, string baseFolder, List<string> ignorePatterns)
         {
             foreach (string f in Directory.GetFiles(folder))
                 yield return f;
             foreach (string d in Directory.GetDirectories(folder))
-                foreach (string f in GetFilesRecursively(d))
+            {
+                string relDir = d.Substring(baseFolder.Length).TrimStart('\\', '/').Replace('\\', '/');
+                if (ShouldIgnoreFolder(relDir, ignorePatterns)) continue;
+                foreach (string f in GetFilesRecursively(d, baseFolder, ignorePatterns))
                     yield return f;
+            }
+        }
+
+        // Checks whether an entire directory should be skipped during the walk.
+        static bool ShouldIgnoreFolder(string relDir, List<string> patterns)
+        {
+            if (patterns == null) return false;
+            string dirName = relDir;
+            int slash = relDir.LastIndexOf('/');
+            if (slash >= 0) dirName = relDir.Substring(slash + 1);
+
+            foreach (string pattern in patterns)
+            {
+                // Explicit folder pattern: bin/
+                if (pattern.EndsWith("/"))
+                {
+                    string p = pattern.TrimEnd('/');
+                    if (relDir.Equals(p, StringComparison.OrdinalIgnoreCase) ||
+                        relDir.StartsWith(p + "/", StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+                // Bare name with no wildcards matches any folder segment of that name
+                else if (!pattern.Contains("*") && !pattern.Contains("?") && !pattern.Contains("/"))
+                {
+                    if (string.Equals(dirName, pattern, StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+            return false;
         }
 
         static bool ShouldIgnore(string relativePath, List<string> patterns)
@@ -125,11 +157,11 @@ namespace PushPull
             foreach (string pattern in patterns)
             {
                 string p = pattern.TrimEnd('/');
-                // Directory prefix match
+                // Explicit folder pattern: bin/
                 if (pattern.EndsWith("/") && (relativePath.StartsWith(p + "/", StringComparison.OrdinalIgnoreCase)
                     || relativePath.Equals(p, StringComparison.OrdinalIgnoreCase)))
                     return true;
-                // Wildcard
+                // Wildcard matches filename or full path
                 if (pattern.Contains("*") || pattern.Contains("?"))
                 {
                     string regex = "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
@@ -137,8 +169,13 @@ namespace PushPull
                     if (Regex.IsMatch(fileName, regex, RegexOptions.IgnoreCase)) return true;
                     if (Regex.IsMatch(relativePath, regex, RegexOptions.IgnoreCase)) return true;
                 }
-                // Exact suffix match
-                if (relativePath.EndsWith(pattern, StringComparison.OrdinalIgnoreCase)) return true;
+                // Bare name with no wildcards: match any folder segment or exact filename
+                else if (!pattern.Contains("/"))
+                {
+                    string[] segments = relativePath.Split('/');
+                    foreach (string seg in segments)
+                        if (string.Equals(seg, pattern, StringComparison.OrdinalIgnoreCase)) return true;
+                }
             }
             return false;
         }
