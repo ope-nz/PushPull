@@ -41,6 +41,24 @@ namespace PushPull
             menuExit.Click += (s, e) => Close();
             menuSettings.Click += (s, e) => ShowSettings();
             menuAbout.Click += (s, e) => MessageBox.Show("PushPull for GitHub", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            contextMenuLocal.Opening += (s, e) =>
+            {
+                var item = listLocal.FocusedItem;
+                if (item == null) { e.Cancel = true; return; }
+                string folder = FolderOf(((FileEntry)item.Tag).RelativePath);
+                menuPushFolder.Text = "Push Folder: " + folder;
+                menuPushFolder.Tag = folder;
+            };
+            menuPushFolder.Click += (s, e) => { string f = menuPushFolder.Tag as string; if (f != null) PushFolder(f); };
+            contextMenuRemote.Opening += (s, e) =>
+            {
+                var item = listRemote.FocusedItem;
+                if (item == null) { e.Cancel = true; return; }
+                string folder = FolderOf(((FileEntry)item.Tag).RelativePath);
+                menuPullFolder.Text = "Pull Folder: " + folder;
+                menuPullFolder.Tag = folder;
+            };
+            menuPullFolder.Click += (s, e) => { string f = menuPullFolder.Tag as string; if (f != null) PullFolder(f); };
             btnRefresh.Click += (s, e) => DoRefresh();
             btnPushSelected.Click += (s, e) => PushSelected();
             btnPullSelected.Click += (s, e) => PullSelected();
@@ -143,9 +161,27 @@ namespace PushPull
             listRemote.BeginUpdate();
             listLocal.Items.Clear();
             listRemote.Items.Clear();
+            listLocal.Groups.Clear();
+            listRemote.Groups.Clear();
+
+            // Build ordered group maps
+            var localGroups = new System.Collections.Generic.SortedDictionary<string, ListViewGroup>(StringComparer.OrdinalIgnoreCase);
+            var remoteGroups = new System.Collections.Generic.SortedDictionary<string, ListViewGroup>(StringComparer.OrdinalIgnoreCase);
+            foreach (var e in _entries)
+            {
+                string folder = FolderOf(e.RelativePath);
+                if (e.ExistsLocally && !localGroups.ContainsKey(folder))
+                    localGroups[folder] = new ListViewGroup(folder);
+                if ((e.ExistsRemotely || e.Status == SyncStatus.LocalOnly) && !remoteGroups.ContainsKey(folder))
+                    remoteGroups[folder] = new ListViewGroup(folder);
+            }
+            foreach (var g in localGroups.Values) listLocal.Groups.Add(g);
+            foreach (var g in remoteGroups.Values) listRemote.Groups.Add(g);
 
             foreach (var e in _entries)
             {
+                string folder = FolderOf(e.RelativePath);
+
                 if (e.ExistsLocally)
                 {
                     var item = new ListViewItem(e.DisplayName);
@@ -154,6 +190,7 @@ namespace PushPull
                     item.SubItems.Add(StatusLabel(e.Status, true));
                     item.Tag = e;
                     item.BackColor = StatusColor(e.Status, true);
+                    item.Group = localGroups[folder];
                     listLocal.Items.Add(item);
                 }
 
@@ -165,12 +202,37 @@ namespace PushPull
                     item.SubItems.Add(StatusLabel(e.Status, false));
                     item.Tag = e;
                     item.BackColor = StatusColor(e.Status, false);
+                    item.Group = remoteGroups[folder];
                     listRemote.Items.Add(item);
                 }
             }
 
             listLocal.EndUpdate();
             listRemote.EndUpdate();
+        }
+
+        static string FolderOf(string relativePath)
+        {
+            int slash = relativePath.LastIndexOfAny(new[] { '/', '\\' });
+            return slash >= 0 ? relativePath.Substring(0, slash) : "(root)";
+        }
+
+        void PushFolder(string folder)
+        {
+            var toSync = _entries.FindAll(e =>
+                FolderOf(e.RelativePath) == folder &&
+                (e.Status == SyncStatus.LocalNewer || e.Status == SyncStatus.LocalOnly));
+            if (toSync.Count == 0) { MessageBox.Show("Nothing to push in this folder."); return; }
+            RunSync(toSync, push: true);
+        }
+
+        void PullFolder(string folder)
+        {
+            var toSync = _entries.FindAll(e =>
+                FolderOf(e.RelativePath) == folder &&
+                (e.Status == SyncStatus.RemoteNewer || e.Status == SyncStatus.RemoteOnly));
+            if (toSync.Count == 0) { MessageBox.Show("Nothing to pull in this folder."); return; }
+            RunSync(toSync, push: false);
         }
 
         string StatusLabel(SyncStatus s, bool local)
@@ -182,7 +244,7 @@ namespace PushPull
                 case SyncStatus.RemoteNewer: return local ? "Outdated" : "Changed";
                 case SyncStatus.LocalOnly: return local ? "Local Only" : "Not on GitHub";
                 case SyncStatus.RemoteOnly: return local ? "Not Local" : "Remote Only";
-                default: return "";
+default: return "";
             }
         }
 
