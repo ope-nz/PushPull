@@ -22,7 +22,10 @@ namespace PushPull
             _original = existing;
             BuildUI();
             AppIcon.Apply(this);
-            if (existing != null) Populate(existing);
+            if (existing != null)
+                Populate(existing);
+            else if (config.DefaultIgnorePatterns != null && config.DefaultIgnorePatterns.Count > 0)
+                txtIgnore.Text = string.Join("\r\n", config.DefaultIgnorePatterns);
         }
 
         void BuildUI()
