@@ -6,11 +6,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web.Script.Serialization;
 
-namespace GFD
+namespace PushPull
 {
     public static class GitHub
     {
-        const string UserAgent = "GFD-app";
+        const string UserAgent = "PushPull-app";
 
         static HttpWebRequest MakeRequest(string url, string method, string token)
         {
@@ -127,7 +127,7 @@ namespace GFD
             req.ContentType = "application/json";
 
             var sb = new StringBuilder("{");
-            sb.Append("\"message\":\"GFD update\"");
+            sb.Append("\"message\":\"PushPull update\"");
             sb.Append(",\"branch\":\"" + branch + "\"");
             sb.Append(",\"content\":\"" + encoded + "\"");
             if (existingSha != null) sb.Append(",\"sha\":\"" + existingSha + "\"");
@@ -161,7 +161,7 @@ namespace GFD
             var req = MakeRequest(url, "DELETE", token);
             req.ContentType = "application/json";
 
-            var body = "{\"message\":\"GFD delete\",\"branch\":\"" + branch + "\",\"sha\":\"" + sha + "\"}";
+            var body = "{\"message\":\"PushPull delete\",\"branch\":\"" + branch + "\",\"sha\":\"" + sha + "\"}";
             using (var sw = new StreamWriter(req.GetRequestStream()))
                 sw.Write(body);
 
