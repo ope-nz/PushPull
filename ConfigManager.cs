@@ -26,6 +26,7 @@ namespace GFD
     public class GfdConfig
     {
         public string Token { get; set; }
+        public string LastProjectName { get; set; }
         public List<GfdProject> Projects { get; set; }
 
         public GfdConfig() { Projects = new List<GfdProject>(); }
