@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -21,13 +22,14 @@ namespace GFD
         public MainForm()
         {
             InitializeComponent();
+            AppIcon.Apply(this);
             WireEvents();
             LoadConfig();
         }
 
         void WireEvents()
         {
-            this.Load += (s, e) => SetButtonStates();
+            this.Load += (s, e) => { SetButtonStates(); if (_currentProject != null) DoRefresh(); };
             menuNewProject.Click += (s, e) => EditProject(null);
             menuEditProject.Click += (s, e) => EditProject(_currentProject);
             menuRemoveProject.Click += (s, e) => RemoveCurrentProject();
@@ -53,7 +55,18 @@ namespace GFD
         {
             cboProject.Items.Clear();
             foreach (var p in _config.Projects) cboProject.Items.Add(p);
-            if (cboProject.Items.Count > 0) cboProject.SelectedIndex = 0;
+
+            // Restore last used project
+            int restoreIdx = 0;
+            if (!string.IsNullOrEmpty(_config.LastProjectName))
+            {
+                for (int i = 0; i < cboProject.Items.Count; i++)
+                {
+                    if (cboProject.Items[i].ToString() == _config.LastProjectName)
+                    { restoreIdx = i; break; }
+                }
+            }
+            if (cboProject.Items.Count > 0) cboProject.SelectedIndex = restoreIdx;
             SetButtonStates();
         }
 
@@ -65,7 +78,11 @@ namespace GFD
             listRemote.Items.Clear();
             SetButtonStates();
             if (_currentProject != null)
+            {
                 lblLocal.Text = "Local: " + _currentProject.LocalFolder;
+                _config.LastProjectName = _currentProject.ToString();
+                ConfigManager.Save(_config);
+            }
         }
 
         void SetButtonStates()
