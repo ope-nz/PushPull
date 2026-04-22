@@ -9,4 +9,11 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe ^
   SettingsDialog.cs ProjectDialog.cs ^
   MainForm.Designer.cs MainForm.cs
 echo EXIT CODE: %ERRORLEVEL%
+
+.\Tools\SetExeFileInfo.exe -action setfileinfo -exe PushPull.exe -key "Copyright" -value "Ope Ltd"
+.\Tools\SetExeFileInfo.exe -action setfileinfo -exe PushPull.exe -key "ProductName" -value "PushPull for GitHub"
+.\Tools\SetExeFileInfo.exe -action setfileinfo -exe PushPull.exe -key "LegalCopyright" -value "https://github.com/ope-nz/PushPull"
+
+.\Tools\SetExeFileInfo.exe -action setversion -exe PushPull.exe -version "1.0.0.0"
+
 pause
