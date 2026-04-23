@@ -41,6 +41,10 @@ namespace PushPull
             menuNewProject.Click += (s, e) => EditProject(null);
             menuEditProject.Click += (s, e) => EditProject(_currentProject);
             menuRemoveProject.Click += (s, e) => RemoveCurrentProject();
+            menuDeleteLocalSelected.Click += (s, e) => DeleteLocalSelected();
+            menuDeleteAllLocal.Click += (s, e) => DeleteAllLocal();
+            menuOpenFolder.Click += (s, e) => OpenLocalFolder();
+            menuOpenOnGitHub.Click += (s, e) => OpenOnGitHub();
             menuDeleteRemoteSelected.Click += (s, e) => DeleteRemoteSelected();
             menuDeleteAllRemote.Click += (s, e) => DeleteAllRemote();
             menuExit.Click += (s, e) => Close();
@@ -128,6 +132,10 @@ namespace PushPull
             btnPullAll.Enabled = hasProject && hasToken;
             menuEditProject.Enabled = hasProject;
             menuRemoveProject.Enabled = hasProject;
+            menuDeleteLocalSelected.Enabled = hasProject;
+            menuDeleteAllLocal.Enabled = hasProject;
+            menuOpenFolder.Enabled = hasProject;
+            menuOpenOnGitHub.Enabled = hasProject;
             menuDeleteRemoteSelected.Enabled = hasProject && hasToken;
             menuDeleteAllRemote.Enabled = hasProject && hasToken;
         }
@@ -296,6 +304,57 @@ default: return "";
             var toSync = _entries.FindAll(e => e.Status == SyncStatus.RemoteNewer || e.Status == SyncStatus.RemoteOnly);
             if (toSync.Count == 0) { MessageBox.Show("Nothing to pull."); return; }
             RunSync(toSync, push: false);
+        }
+
+        void DeleteLocalSelected()
+        {
+            var toDelete = GetSelectedEntries(listLocal).FindAll(e => e.ExistsLocally);
+            if (toDelete.Count == 0) { MessageBox.Show("Select local files to delete.", "Delete Local"); return; }
+            string msg = string.Format("Send {0} file(s) to the Recycle Bin?", toDelete.Count);
+            if (MessageBox.Show(msg, "Delete Local Files", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            RunDeleteLocal(toDelete);
+        }
+
+        void DeleteAllLocal()
+        {
+            var toDelete = _entries.FindAll(e => e.ExistsLocally);
+            if (toDelete.Count == 0) { MessageBox.Show("No local files to delete."); return; }
+            string msg = string.Format("Send ALL {0} local file(s) to the Recycle Bin?", toDelete.Count);
+            if (MessageBox.Show(msg, "Delete All Local Files", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            RunDeleteLocal(toDelete);
+        }
+
+        void RunDeleteLocal(List<FileEntry> entries)
+        {
+            int done = 0, failed = 0;
+            foreach (var e in entries)
+            {
+                string localPath = System.IO.Path.Combine(_currentProject.LocalFolder, e.RelativePath.Replace('/', '\\'));
+                try
+                {
+                    Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(
+                        localPath,
+                        Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs,
+                        Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                    done++;
+                }
+                catch { failed++; }
+            }
+            SetStatus(string.Format("Deleted {0} local file(s), {1} failed.", done, failed));
+            DoRefresh();
+        }
+
+        void OpenOnGitHub()
+        {
+            if (_currentProject == null) return;
+            string url = string.Format("https://github.com/{0}/{1}", _currentProject.Owner, _currentProject.Repo);
+            System.Diagnostics.Process.Start(url);
+        }
+
+        void OpenLocalFolder()
+        {
+            if (_currentProject == null) return;
+            System.Diagnostics.Process.Start("explorer.exe", _currentProject.LocalFolder);
         }
 
         void DeleteRemoteSelected()
