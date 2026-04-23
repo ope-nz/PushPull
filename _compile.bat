@@ -14,6 +14,8 @@ echo EXIT CODE: %ERRORLEVEL%
 .\Tools\SetExeFileInfo.exe -action setfileinfo -exe PushPull.exe -key "ProductName" -value "PushPull for GitHub"
 .\Tools\SetExeFileInfo.exe -action setfileinfo -exe PushPull.exe -key "LegalCopyright" -value "https://github.com/ope-nz/PushPull"
 
-.\Tools\SetExeFileInfo.exe -action setversion -exe PushPull.exe -version "1.0.0.0"
+for /f "tokens=*" %%v in ('powershell -NoProfile -Command "Get-Date -Format 'yyyy.MM.dd.HHmm'"') do set BUILD_VERSION=%%v
+.\Tools\SetExeFileInfo.exe -action setversion -exe PushPull.exe -version "%BUILD_VERSION%"
+echo Version: %BUILD_VERSION%
 
 pause
