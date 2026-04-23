@@ -21,9 +21,16 @@ namespace PushPull
             this.menuSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSettingsSep = new System.Windows.Forms.ToolStripSeparator();
             this.menuExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuLocal = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuDeleteLocalSelected = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuDeleteAllLocal = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuLocalSep = new System.Windows.Forms.ToolStripSeparator();
+            this.menuOpenFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRemote = new System.Windows.Forms.ToolStripMenuItem();
             this.menuDeleteRemoteSelected = new System.Windows.Forms.ToolStripMenuItem();
             this.menuDeleteAllRemote = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuRemoteSep = new System.Windows.Forms.ToolStripSeparator();
+            this.menuOpenOnGitHub = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuAbout = new System.Windows.Forms.ToolStripMenuItem();
 
@@ -64,15 +71,24 @@ namespace PushPull
 
             // menuStrip
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.menuFile, this.menuRemote, this.menuHelp });
+                this.menuFile, this.menuLocal, this.menuRemote, this.menuHelp });
             this.menuFile.Text = "&File";
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.menuNewProject, this.menuEditProject, this.menuRemoveProject,
                 this.menuFileSep, this.menuSettings, this.menuSettingsSep, this.menuExit });
             this.menuSettings.Text = "&Settings...";
+            this.menuLocal.Text = "&Local";
+            this.menuLocal.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuDeleteLocalSelected, this.menuDeleteAllLocal, this.menuLocalSep, this.menuOpenFolder });
+            this.menuDeleteLocalSelected.Text = "Delete Selected Local Files...";
+            this.menuDeleteAllLocal.Text = "Delete All Local Files...";
+            this.menuOpenFolder.Text = "Open in Explorer";
             this.menuRemote.Text = "&Remote";
             this.menuRemote.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.menuDeleteRemoteSelected, this.menuDeleteAllRemote });
+                this.menuDeleteRemoteSelected, this.menuDeleteAllRemote,
+                this.menuRemoteSep, this.menuOpenOnGitHub });
+            this.menuRemoteSep.Text = "-";
+            this.menuOpenOnGitHub.Text = "Open on GitHub";
             this.menuDeleteRemoteSelected.Text = "Delete Selected Remote Files...";
             this.menuDeleteAllRemote.Text = "Delete All Remote Files...";
             this.menuNewProject.Text = "&New Project...";
@@ -200,9 +216,16 @@ namespace PushPull
         private System.Windows.Forms.ToolStripMenuItem menuSettings;
         private System.Windows.Forms.ToolStripSeparator menuSettingsSep;
         private System.Windows.Forms.ToolStripMenuItem menuExit;
+        private System.Windows.Forms.ToolStripMenuItem menuLocal;
+        private System.Windows.Forms.ToolStripMenuItem menuDeleteLocalSelected;
+        private System.Windows.Forms.ToolStripMenuItem menuDeleteAllLocal;
+        private System.Windows.Forms.ToolStripSeparator menuLocalSep;
+        private System.Windows.Forms.ToolStripMenuItem menuOpenFolder;
         private System.Windows.Forms.ToolStripMenuItem menuRemote;
         private System.Windows.Forms.ToolStripMenuItem menuDeleteRemoteSelected;
         private System.Windows.Forms.ToolStripMenuItem menuDeleteAllRemote;
+        private System.Windows.Forms.ToolStripSeparator menuRemoteSep;
+        private System.Windows.Forms.ToolStripMenuItem menuOpenOnGitHub;
         private System.Windows.Forms.ToolStripMenuItem menuHelp;
         private System.Windows.Forms.ToolStripMenuItem menuAbout;
         private System.Windows.Forms.ToolStrip toolStrip;
