@@ -18,12 +18,12 @@ namespace PushPull
             this.menuEditProject = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRemoveProject = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFileSep = new System.Windows.Forms.ToolStripSeparator();
+            this.menuSettings = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSettingsSep = new System.Windows.Forms.ToolStripSeparator();
             this.menuExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRemote = new System.Windows.Forms.ToolStripMenuItem();
             this.menuDeleteRemoteSelected = new System.Windows.Forms.ToolStripMenuItem();
             this.menuDeleteAllRemote = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuTools = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuAbout = new System.Windows.Forms.ToolStripMenuItem();
 
@@ -64,11 +64,12 @@ namespace PushPull
 
             // menuStrip
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.menuFile, this.menuRemote, this.menuTools, this.menuHelp });
+                this.menuFile, this.menuRemote, this.menuHelp });
             this.menuFile.Text = "&File";
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.menuNewProject, this.menuEditProject, this.menuRemoveProject,
-                this.menuFileSep, this.menuExit });
+                this.menuFileSep, this.menuSettings, this.menuSettingsSep, this.menuExit });
+            this.menuSettings.Text = "&Settings...";
             this.menuRemote.Text = "&Remote";
             this.menuRemote.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.menuDeleteRemoteSelected, this.menuDeleteAllRemote });
@@ -78,9 +79,6 @@ namespace PushPull
             this.menuEditProject.Text = "&Edit Project...";
             this.menuRemoveProject.Text = "&Remove Project";
             this.menuExit.Text = "E&xit";
-            this.menuTools.Text = "&Options";
-            this.menuTools.DropDownItems.Add(this.menuSettings);
-            this.menuSettings.Text = "&Settings...";
             this.menuHelp.Text = "&Help";
             this.menuHelp.DropDownItems.Add(this.menuAbout);
             this.menuAbout.Text = "&About...";
@@ -199,12 +197,12 @@ namespace PushPull
         private System.Windows.Forms.ToolStripMenuItem menuEditProject;
         private System.Windows.Forms.ToolStripMenuItem menuRemoveProject;
         private System.Windows.Forms.ToolStripSeparator menuFileSep;
+        private System.Windows.Forms.ToolStripMenuItem menuSettings;
+        private System.Windows.Forms.ToolStripSeparator menuSettingsSep;
         private System.Windows.Forms.ToolStripMenuItem menuExit;
         private System.Windows.Forms.ToolStripMenuItem menuRemote;
         private System.Windows.Forms.ToolStripMenuItem menuDeleteRemoteSelected;
         private System.Windows.Forms.ToolStripMenuItem menuDeleteAllRemote;
-        private System.Windows.Forms.ToolStripMenuItem menuTools;
-        private System.Windows.Forms.ToolStripMenuItem menuSettings;
         private System.Windows.Forms.ToolStripMenuItem menuHelp;
         private System.Windows.Forms.ToolStripMenuItem menuAbout;
         private System.Windows.Forms.ToolStrip toolStrip;
