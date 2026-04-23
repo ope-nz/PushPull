@@ -2,6 +2,10 @@
 
 A simple Windows desktop app for syncing a local folder with a GitHub repository, without needing Git installed.
 
+Aimed at solo developers and non-technical users who want to use GitHub for file backup and sharing but find Git, SSH keys, and the command line intimidating. If you just want to keep a folder in sync with a repo and don't need branching, merging, or a full Git workflow, PushPull gets out of the way and lets you do that with a few clicks.
+
+Good for: scripts and config files you want backed up offsite, sharing assets between machines, lightweight version history without learning Git, or anywhere a full Git client feels like overkill.
+
 ![PushPull Screenshot](screenshot.png)
 
 ## Features
@@ -16,7 +20,8 @@ A simple Windows desktop app for syncing a local folder with a GitHub repository
 - Click column headers to sort by name or date
 - Flexible ignore patterns: wildcards, file extensions, and folder names
 - Restores your last project, window position, and size on startup
-- Command line support for scripted or automated pushes
+- Single instance: launching a second copy raises the existing window
+- Command line support for opening a specific project or pushing without a UI
 
 ## Requirements
 
@@ -114,13 +119,19 @@ node_modules
 
 ## Command Line
 
-You can push all changed files for a project without opening the UI:
+Two modes are available from the command line:
 
+**Open the app with a project pre-selected:**
 ```
 PushPull.exe "MyProject"
 ```
 
-Replace `MyProject` with the name you gave the project in the app. The exit code is `0` on success and `1` if the project was not found or all uploads failed. Output goes to the calling terminal, making it easy to use in scripts or scheduled tasks.
+**Push all changed files without opening the UI:**
+```
+PushPull.exe "MyProject" push
+```
+
+Replace `MyProject` with the name you gave the project in the app. In push mode, output goes to the calling terminal and the exit code is `0` on success or `1` if the project was not found or all uploads failed. Multiple push instances can run concurrently without interfering with the single-instance GUI check.
 
 ## Portable Mode
 
