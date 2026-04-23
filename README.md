@@ -16,7 +16,8 @@ Good for: scripts and config files you want backed up offsite, sharing assets be
 - Files grouped by folder, with full relative paths shown for easy navigation
 - Color-coded status: see at a glance which files are newer locally, newer on GitHub, or only exist on one side
 - Push or pull individual files, all changed files, or all files in a folder (right-click)
-- Delete selected or all remote files via the Remote menu
+- Local menu: delete selected or all local files (sent to Recycle Bin), open project folder in Explorer
+- Remote menu: delete selected or all remote files, open the repo on GitHub
 - Click column headers to sort by name or date
 - Flexible ignore patterns: wildcards, file extensions, and folder names
 - Restores your last project, window position, and size on startup
@@ -44,7 +45,7 @@ No installer. Just download `PushPull.exe` and run it.
 
 ### 2. Enter your token
 
-Open PushPull, go to **Options > Settings**, paste your token and click **Test Connection** to verify it works.
+Open PushPull, go to **File > Settings**, paste your token and click **Test Connection** to verify it works.
 
 ### 3. Add a project
 
@@ -83,16 +84,25 @@ Use the toolbar buttons to sync:
 
 Right-click any file to get a **Push Folder** or **Pull Folder** option, which syncs all changed files in that folder only.
 
-## Deleting Remote Files
-
-Use the **Remote** menu to delete files from GitHub:
+## Local Menu
 
 | Option | Action |
 |---|---|
-| **Delete Selected Remote Files...** | Deletes the files selected in the remote pane |
-| **Delete All Remote Files...** | Deletes every file in the repository for the current project |
+| **Delete Selected Local Files...** | Sends selected files in the left pane to the Recycle Bin |
+| **Delete All Local Files...** | Sends every local file in the project folder to the Recycle Bin |
+| **Open in Explorer** | Opens the project folder in Windows Explorer |
 
-Both options prompt for confirmation before making any changes.
+Delete options prompt for confirmation before making any changes. Files are recoverable from the Recycle Bin.
+
+## Remote Menu
+
+| Option | Action |
+|---|---|
+| **Delete Selected Remote Files...** | Permanently deletes the files selected in the remote pane from GitHub |
+| **Delete All Remote Files...** | Permanently deletes every file in the repository for the current project |
+| **Open on GitHub** | Opens the repository in your default browser |
+
+Delete options prompt for confirmation before making any changes.
 
 ## Ignore Patterns
 
