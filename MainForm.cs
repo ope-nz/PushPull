@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -46,7 +45,7 @@ namespace PushPull
             menuDeleteAllRemote.Click += (s, e) => DeleteAllRemote();
             menuExit.Click += (s, e) => Close();
             menuSettings.Click += (s, e) => ShowSettings();
-            menuAbout.Click += (s, e) => MessageBox.Show("PushPull for GitHub\n\n" + Assembly.GetExecutingAssembly().GetName().Version + "\n\nby Ope Ltd", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            menuAbout.Click += (s, e) => MessageBox.Show("PushPull for GitHub\n\n" + System.Diagnostics.FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileVersion + "\n\nby Ope Ltd", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
             contextMenuLocal.Opening += (s, e) =>
             {
                 var item = listLocal.FocusedItem;
