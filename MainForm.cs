@@ -13,14 +13,16 @@ namespace PushPull
         GfdConfig _config;
         GfdProject _currentProject;
         List<FileEntry> _entries = new List<FileEntry>();
+        string _startupProjectName;
 
         static readonly Color ColorLocalNewer = Color.FromArgb(200, 255, 200);
         static readonly Color ColorRemoteNewer = Color.FromArgb(200, 220, 255);
         static readonly Color ColorLocalOnly = Color.FromArgb(180, 255, 180);
         static readonly Color ColorRemoteOnly = Color.FromArgb(180, 200, 255);
 
-        public MainForm()
+        public MainForm(string startupProject = null)
         {
+            _startupProjectName = startupProject;
             InitializeComponent();
             AppIcon.Apply(this);
             WireEvents();
@@ -84,13 +86,15 @@ namespace PushPull
             cboProject.Items.Clear();
             foreach (var p in _config.Projects) cboProject.Items.Add(p);
 
-            // Restore last used project
+            // Restore startup project (from CLI arg) or last used project
             int restoreIdx = 0;
-            if (!string.IsNullOrEmpty(_config.LastProjectName))
+            string nameToRestore = _startupProjectName ?? _config.LastProjectName;
+            _startupProjectName = null;
+            if (!string.IsNullOrEmpty(nameToRestore))
             {
                 for (int i = 0; i < cboProject.Items.Count; i++)
                 {
-                    if (cboProject.Items[i].ToString() == _config.LastProjectName)
+                    if (cboProject.Items[i].ToString() == nameToRestore)
                     { restoreIdx = i; break; }
                 }
             }
