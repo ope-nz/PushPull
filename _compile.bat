@@ -7,7 +7,7 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe ^
   /r:System.Net.dll /r:System.Web.Extensions.dll /r:System.Security.dll ^
   /r:Microsoft.VisualBasic.dll ^
   Program.cs GitHub.cs ConfigManager.cs SyncEngine.cs AppIcon.cs ^
-  SettingsDialog.cs ProjectDialog.cs ^
+  SettingsDialog.cs ProjectDialog.cs CommentDialog.cs ^
   MainForm.Designer.cs MainForm.cs
 echo EXIT CODE: %ERRORLEVEL%
 
