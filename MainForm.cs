@@ -74,6 +74,7 @@ namespace PushPull
             btnPushSelected.Click += (s, e) => PushSelected();
             btnPullSelected.Click += (s, e) => PullSelected();
             btnPushAll.Click += (s, e) => PushAll();
+            btnPushAllWithComment.Click += (s, e) => PushAllWithComment();
             btnPullAll.Click += (s, e) => PullAll();
             cboProject.SelectedIndexChanged += (s, e) => OnProjectChanged();
             listLocal.ColumnClick += (s, e) => SortList(listLocal, e.Column);
@@ -131,6 +132,7 @@ namespace PushPull
             btnPushSelected.Enabled = hasProject && hasToken;
             btnPullSelected.Enabled = hasProject && hasToken;
             btnPushAll.Enabled = hasProject && hasToken;
+            btnPushAllWithComment.Enabled = hasProject && hasToken;
             btnPullAll.Enabled = hasProject && hasToken;
             menuEditProject.Enabled = hasProject;
             menuRemoveProject.Enabled = hasProject;
@@ -301,6 +303,18 @@ default: return "";
             RunSync(toSync, push: true);
         }
 
+        void PushAllWithComment()
+        {
+            var toSync = _entries.FindAll(e => e.Status == SyncStatus.LocalNewer || e.Status == SyncStatus.LocalOnly);
+            if (toSync.Count == 0) { MessageBox.Show("Nothing to push."); return; }
+            using (var dlg = new CommentDialog())
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK) return;
+                string msg = string.IsNullOrWhiteSpace(dlg.Comment) ? "PushPull update" : dlg.Comment;
+                RunSync(toSync, push: true, commitMessage: msg);
+            }
+        }
+
         void PullAll()
         {
             var toSync = _entries.FindAll(e => e.Status == SyncStatus.RemoteNewer || e.Status == SyncStatus.RemoteOnly);
@@ -418,7 +432,7 @@ default: return "";
             return list;
         }
 
-        void RunSync(List<FileEntry> entries, bool push)
+        void RunSync(List<FileEntry> entries, bool push, string commitMessage = "PushPull update")
         {
             var project = _currentProject;
             var token = _config.Token;
@@ -428,6 +442,7 @@ default: return "";
             Cursor = Cursors.WaitCursor;
             SetAllButtons(false);
 
+            var message = commitMessage;
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 foreach (var e in entries)
@@ -438,7 +453,7 @@ default: return "";
                         {
                             string localPath = Path.Combine(project.LocalFolder, e.RelativePath.Replace('/', '\\'));
                             GitHub.UploadFile(token, project.Owner, project.Repo, project.Branch,
-                                e.RelativePath, localPath, e.ExistsRemotely ? e.RemoteSha : null);
+                                e.RelativePath, localPath, e.ExistsRemotely ? e.RemoteSha : null, message);
                         }
                         else
                         {
@@ -468,6 +483,7 @@ default: return "";
             btnPushSelected.Enabled = enabled;
             btnPullSelected.Enabled = enabled;
             btnPushAll.Enabled = enabled;
+            btnPushAllWithComment.Enabled = enabled;
             btnPullAll.Enabled = enabled;
         }
 
@@ -478,7 +494,10 @@ default: return "";
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
                     if (existing == null)
+                    {
                         _config.Projects.Add(dlg.Project);
+                        _config.LastProjectName = dlg.Project.ToString();
+                    }
                     else
                     {
                         int idx = _config.Projects.IndexOf(existing);
