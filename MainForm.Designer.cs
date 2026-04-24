@@ -41,6 +41,7 @@ namespace PushPull
             this.btnPullSelected = new System.Windows.Forms.ToolStripButton();
             this.toolSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.btnPushAll = new System.Windows.Forms.ToolStripButton();
+            this.btnPushAllWithComment = new System.Windows.Forms.ToolStripButton();
             this.btnPullAll = new System.Windows.Forms.ToolStripButton();
 
             this.topPanel = new System.Windows.Forms.Panel();
@@ -108,11 +109,13 @@ namespace PushPull
             this.btnPullSelected.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.btnPushAll.Text = "Push All";
             this.btnPushAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnPushAllWithComment.Text = "Push All + Comment";
+            this.btnPushAllWithComment.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.btnPullAll.Text = "Pull All";
             this.btnPullAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.btnRefresh, this.toolSep1,
-                this.btnPushSelected, this.btnPushAll,
+                this.btnPushSelected, this.btnPushAll, this.btnPushAllWithComment,
                 this.toolSep2, this.btnPullSelected, this.btnPullAll });
 
             // topPanel
@@ -235,6 +238,7 @@ namespace PushPull
         private System.Windows.Forms.ToolStripButton btnPullSelected;
         private System.Windows.Forms.ToolStripSeparator toolSep2;
         private System.Windows.Forms.ToolStripButton btnPushAll;
+        private System.Windows.Forms.ToolStripButton btnPushAllWithComment;
         private System.Windows.Forms.ToolStripButton btnPullAll;
         private System.Windows.Forms.Panel topPanel;
         private System.Windows.Forms.Label lblProject;
