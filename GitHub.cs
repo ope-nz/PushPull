@@ -117,7 +117,7 @@ namespace PushPull
         }
 
         public static bool UploadFile(string token, string owner, string repo, string branch,
-            string relativePath, string localFullPath, string existingSha)
+            string relativePath, string localFullPath, string existingSha, string commitMessage = "PushPull update")
         {
             byte[] content = File.ReadAllBytes(localFullPath);
             string encoded = Convert.ToBase64String(content);
@@ -126,8 +126,9 @@ namespace PushPull
             var req = MakeRequest(url, "PUT", token);
             req.ContentType = "application/json";
 
+            string safeMsg = commitMessage.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "\\n");
             var sb = new StringBuilder("{");
-            sb.Append("\"message\":\"PushPull update\"");
+            sb.Append("\"message\":\"" + safeMsg + "\"");
             sb.Append(",\"branch\":\"" + branch + "\"");
             sb.Append(",\"content\":\"" + encoded + "\"");
             if (existingSha != null) sb.Append(",\"sha\":\"" + existingSha + "\"");
