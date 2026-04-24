@@ -24,8 +24,13 @@ namespace PushPull
             AppIcon.Apply(this);
             if (existing != null)
                 Populate(existing);
-            else if (config.DefaultIgnorePatterns != null && config.DefaultIgnorePatterns.Count > 0)
-                txtIgnore.Text = string.Join("\r\n", config.DefaultIgnorePatterns);
+            else
+            {
+                if (!string.IsNullOrEmpty(config.DefaultOwner))
+                    txtOwner.Text = config.DefaultOwner;
+                if (config.DefaultIgnorePatterns != null && config.DefaultIgnorePatterns.Count > 0)
+                    txtIgnore.Text = string.Join("\r\n", config.DefaultIgnorePatterns);
+            }
         }
 
         void BuildUI()
