@@ -52,27 +52,11 @@ namespace PushPull
             menuExit.Click += (s, e) => Close();
             menuSettings.Click += (s, e) => ShowSettings();
             menuAbout.Click += (s, e) => MessageBox.Show("PushPull for GitHub\n\n" + System.Diagnostics.FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileVersion + "\n\nby Ope Ltd", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            contextMenuLocal.Opening += (s, e) =>
-            {
-                var item = listLocal.FocusedItem;
-                if (item == null) { e.Cancel = true; return; }
-                string folder = FolderOf(((FileEntry)item.Tag).RelativePath);
-                menuPushFolder.Text = "Push Folder: " + folder;
-                menuPushFolder.Tag = folder;
-            };
-            menuPushFolder.Click += (s, e) => { string f = menuPushFolder.Tag as string; if (f != null) PushFolder(f); };
-            contextMenuRemote.Opening += (s, e) =>
-            {
-                var item = listRemote.FocusedItem;
-                if (item == null) { e.Cancel = true; return; }
-                string folder = FolderOf(((FileEntry)item.Tag).RelativePath);
-                menuPullFolder.Text = "Pull Folder: " + folder;
-                menuPullFolder.Tag = folder;
-            };
-            menuPullFolder.Click += (s, e) => { string f = menuPullFolder.Tag as string; if (f != null) PullFolder(f); };
+            contextMenuLocal.Opening += (s, e) => { if (listLocal.SelectedItems.Count == 0) e.Cancel = true; };
+            menuPushFolder.Click += (s, e) => PushSelected();
+            contextMenuRemote.Opening += (s, e) => { if (listRemote.SelectedItems.Count == 0) e.Cancel = true; };
+            menuPullFolder.Click += (s, e) => PullSelected();
             btnRefresh.Click += (s, e) => DoRefresh();
-            btnPushSelected.Click += (s, e) => PushSelected();
-            btnPullSelected.Click += (s, e) => PullSelected();
             btnPushAll.Click += (s, e) => PushAll();
             btnPushAllWithComment.Click += (s, e) => PushAllWithComment();
             btnPullAll.Click += (s, e) => PullAll();
@@ -129,8 +113,6 @@ namespace PushPull
             bool hasProject = _currentProject != null;
             bool hasToken = _config != null && !string.IsNullOrWhiteSpace(_config.Token);
             btnRefresh.Enabled = hasProject && hasToken;
-            btnPushSelected.Enabled = hasProject && hasToken;
-            btnPullSelected.Enabled = hasProject && hasToken;
             btnPushAll.Enabled = hasProject && hasToken;
             btnPushAllWithComment.Enabled = hasProject && hasToken;
             btnPullAll.Enabled = hasProject && hasToken;
@@ -239,23 +221,6 @@ namespace PushPull
             return slash >= 0 ? relativePath.Substring(0, slash) : "(root)";
         }
 
-        void PushFolder(string folder)
-        {
-            var toSync = _entries.FindAll(e =>
-                FolderOf(e.RelativePath) == folder &&
-                (e.Status == SyncStatus.LocalNewer || e.Status == SyncStatus.LocalOnly));
-            if (toSync.Count == 0) { MessageBox.Show("Nothing to push in this folder."); return; }
-            RunSync(toSync, push: true);
-        }
-
-        void PullFolder(string folder)
-        {
-            var toSync = _entries.FindAll(e =>
-                FolderOf(e.RelativePath) == folder &&
-                (e.Status == SyncStatus.RemoteNewer || e.Status == SyncStatus.RemoteOnly));
-            if (toSync.Count == 0) { MessageBox.Show("Nothing to pull in this folder."); return; }
-            RunSync(toSync, push: false);
-        }
 
         string StatusLabel(SyncStatus s, bool local)
         {
@@ -480,8 +445,6 @@ default: return "";
         void SetAllButtons(bool enabled)
         {
             btnRefresh.Enabled = enabled;
-            btnPushSelected.Enabled = enabled;
-            btnPullSelected.Enabled = enabled;
             btnPushAll.Enabled = enabled;
             btnPushAllWithComment.Enabled = enabled;
             btnPullAll.Enabled = enabled;
