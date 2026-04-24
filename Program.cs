@@ -23,13 +23,24 @@ namespace PushPull
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
-            // CLI push mode: PushPull.exe "Project" push
+            // CLI push mode: PushPull.exe "Project" push [comment]
             if (args.Length >= 2 && string.Equals(args[1], "push", StringComparison.OrdinalIgnoreCase))
             {
+                string commitMessage = "PushPull update";
+                if (args.Length >= 3 && string.Equals(args[2], "comment", StringComparison.OrdinalIgnoreCase))
+                {
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    using (var dlg = new CommentDialog())
+                    {
+                        if (dlg.ShowDialog() != DialogResult.OK) Environment.Exit(0);
+                        commitMessage = string.IsNullOrWhiteSpace(dlg.Comment) ? "PushPull update" : dlg.Comment;
+                    }
+                }
                 if (!AttachConsole(-1)) AllocConsole();
                 var writer = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
                 Console.SetOut(writer);
-                Environment.Exit(RunCliPush(args[0]));
+                Environment.Exit(RunCliPush(args[0], commitMessage));
                 return;
             }
 
@@ -57,7 +68,7 @@ namespace PushPull
             mutex.ReleaseMutex();
         }
 
-        static int RunCliPush(string projectName)
+        static int RunCliPush(string projectName, string commitMessage)
         {
             var config = ConfigManager.Load();
 
@@ -121,7 +132,7 @@ namespace PushPull
                 try
                 {
                     GitHub.UploadFile(config.Token, project.Owner, project.Repo, project.Branch,
-                        e.RelativePath, localPath, e.ExistsRemotely ? e.RemoteSha : null);
+                        e.RelativePath, localPath, e.ExistsRemotely ? e.RemoteSha : null, commitMessage);
                     Console.WriteLine("  OK    " + e.RelativePath);
                     done++;
                 }
