@@ -8,6 +8,7 @@ namespace PushPull
     {
         GfdConfig _config;
         TextBox txtToken;
+        TextBox txtDefaultOwner;
         TextBox txtDefaultIgnore;
 
         public SettingsDialog(GfdConfig config)
@@ -22,7 +23,7 @@ namespace PushPull
             this.Text = "Settings";
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterParent;
-            this.ClientSize = new System.Drawing.Size(480, 260);
+            this.ClientSize = new System.Drawing.Size(480, 300);
             this.MinimizeBox = false;
             this.MaximizeBox = false;
 
@@ -37,11 +38,19 @@ namespace PushPull
             var btnShow = new Button { Text = "Show", Location = new System.Drawing.Point(398, 33), Width = 60 };
             btnShow.Click += (s, e) => { txtToken.UseSystemPasswordChar = !txtToken.UseSystemPasswordChar; btnShow.Text = txtToken.UseSystemPasswordChar ? "Show" : "Hide"; };
 
-            var lblIgnore = new Label { Text = "Default Ignore Patterns:", Location = new System.Drawing.Point(12, 75), AutoSize = true };
-            var lblIgnoreHint = new Label { Text = "(applied to new projects, one per line)", Location = new System.Drawing.Point(175, 75), AutoSize = true, ForeColor = System.Drawing.Color.Gray };
-            txtDefaultIgnore = new TextBox
+            var lblOwner = new Label { Text = "Default Repo Owner:", Location = new System.Drawing.Point(12, 75), AutoSize = true };
+            txtDefaultOwner = new TextBox
             {
                 Location = new System.Drawing.Point(12, 95),
+                Width = 240,
+                Text = _config.DefaultOwner ?? ""
+            };
+
+            var lblIgnore = new Label { Text = "Default Ignore Patterns:", Location = new System.Drawing.Point(12, 130), AutoSize = true };
+            var lblIgnoreHint = new Label { Text = "(applied to new projects, one per line)", Location = new System.Drawing.Point(175, 130), AutoSize = true, ForeColor = System.Drawing.Color.Gray };
+            txtDefaultIgnore = new TextBox
+            {
+                Location = new System.Drawing.Point(12, 150),
                 Width = 446,
                 Height = 100,
                 Multiline = true,
@@ -50,15 +59,16 @@ namespace PushPull
                 Text = _config.DefaultIgnorePatterns != null ? string.Join("\r\n", _config.DefaultIgnorePatterns) : ""
             };
 
-            var btnTest = new Button { Text = "Test Connection", Location = new System.Drawing.Point(12, 215), Width = 120 };
+            var btnTest = new Button { Text = "Test Connection", Location = new System.Drawing.Point(12, 260), Width = 120 };
             btnTest.Click += (s, e) => TestConnection();
 
-            var btnOk = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new System.Drawing.Point(300, 215), Width = 75 };
-            var btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, Location = new System.Drawing.Point(382, 215), Width = 75 };
+            var btnOk = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new System.Drawing.Point(300, 260), Width = 75 };
+            var btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, Location = new System.Drawing.Point(382, 260), Width = 75 };
 
             btnOk.Click += (s, e) =>
             {
                 _config.Token = txtToken.Text.Trim();
+                _config.DefaultOwner = txtDefaultOwner.Text.Trim();
                 var patterns = new List<string>();
                 foreach (string line in txtDefaultIgnore.Text.Split('\n'))
                 {
@@ -70,7 +80,7 @@ namespace PushPull
 
             this.AcceptButton = btnOk;
             this.CancelButton = btnCancel;
-            this.Controls.AddRange(new Control[] { lblToken, txtToken, btnShow, lblIgnore, lblIgnoreHint, txtDefaultIgnore, btnTest, btnOk, btnCancel });
+            this.Controls.AddRange(new Control[] { lblToken, txtToken, btnShow, lblOwner, txtDefaultOwner, lblIgnore, lblIgnoreHint, txtDefaultIgnore, btnTest, btnOk, btnCancel });
         }
 
         void TestConnection()
