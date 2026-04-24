@@ -28,6 +28,8 @@ namespace PushPull
             LoadConfig();
         }
 
+
+
         void WireEvents()
         {
             this.Load += (s, e) =>
