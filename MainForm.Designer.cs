@@ -37,8 +37,6 @@ namespace PushPull
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.btnRefresh = new System.Windows.Forms.ToolStripButton();
             this.toolSep1 = new System.Windows.Forms.ToolStripSeparator();
-            this.btnPushSelected = new System.Windows.Forms.ToolStripButton();
-            this.btnPullSelected = new System.Windows.Forms.ToolStripButton();
             this.toolSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.btnPushAll = new System.Windows.Forms.ToolStripButton();
             this.btnPushAllWithComment = new System.Windows.Forms.ToolStripButton();
@@ -103,20 +101,20 @@ namespace PushPull
             // toolStrip
             this.btnRefresh.Text = "Refresh";
             this.btnRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnPushSelected.Text = "Push Selected";
-            this.btnPushSelected.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnPullSelected.Text = "Pull Selected";
-            this.btnPullSelected.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnPushAll.Text = "Push All";
+            this.btnRefresh.ToolTipText = "Refresh - compare local files against GitHub and update the lists";
+            this.btnPushAll.Text = "Push";
             this.btnPushAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnPushAllWithComment.Text = "Push All + Comment";
+            this.btnPushAll.ToolTipText = "Push - upload all new and changed local files to GitHub";
+            this.btnPushAllWithComment.Text = "Push+";
             this.btnPushAllWithComment.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.btnPullAll.Text = "Pull All";
+            this.btnPushAllWithComment.ToolTipText = "Push with Comment - enter a commit message, then upload all new and changed local files to GitHub";
+            this.btnPullAll.Text = "Pull";
             this.btnPullAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnPullAll.ToolTipText = "Pull - download all new and changed remote files from GitHub to local";
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.btnRefresh, this.toolSep1,
-                this.btnPushSelected, this.btnPushAll, this.btnPushAllWithComment,
-                this.toolSep2, this.btnPullSelected, this.btnPullAll });
+                this.btnPushAll, this.btnPushAllWithComment,
+                this.toolSep2, this.btnPullAll });
 
             // topPanel
             this.topPanel.Height = 32;
@@ -158,7 +156,7 @@ namespace PushPull
             this.listLocal.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listLocal.OwnerDraw = false;
             this.contextMenuLocal.Items.Add(this.menuPushFolder);
-            this.menuPushFolder.Text = "Push Folder";
+            this.menuPushFolder.Text = "Push Selected";
             this.listLocal.ContextMenuStrip = this.contextMenuLocal;
             this.splitContainer.Panel1.Controls.Add(this.listLocal);
             this.splitContainer.Panel1.Controls.Add(this.lblLocal);
@@ -185,7 +183,7 @@ namespace PushPull
             this.listRemote.ShowGroups = true;
             this.listRemote.Dock = System.Windows.Forms.DockStyle.Fill;
             this.contextMenuRemote.Items.Add(this.menuPullFolder);
-            this.menuPullFolder.Text = "Pull Folder";
+            this.menuPullFolder.Text = "Pull Selected";
             this.listRemote.ContextMenuStrip = this.contextMenuRemote;
             this.splitContainer.Panel2.Controls.Add(this.listRemote);
             this.splitContainer.Panel2.Controls.Add(this.lblRemote);
@@ -234,8 +232,6 @@ namespace PushPull
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.ToolStripButton btnRefresh;
         private System.Windows.Forms.ToolStripSeparator toolSep1;
-        private System.Windows.Forms.ToolStripButton btnPushSelected;
-        private System.Windows.Forms.ToolStripButton btnPullSelected;
         private System.Windows.Forms.ToolStripSeparator toolSep2;
         private System.Windows.Forms.ToolStripButton btnPushAll;
         private System.Windows.Forms.ToolStripButton btnPushAllWithComment;
