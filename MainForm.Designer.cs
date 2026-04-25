@@ -35,16 +35,15 @@ namespace PushPull
             this.menuAbout = new System.Windows.Forms.ToolStripMenuItem();
 
             this.toolStrip = new System.Windows.Forms.ToolStrip();
-            this.btnRefresh = new System.Windows.Forms.ToolStripButton();
+            this.lblProjectStrip = new System.Windows.Forms.ToolStripLabel();
+            this.cboProject = new System.Windows.Forms.ToolStripComboBox();
             this.toolSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnRefresh = new System.Windows.Forms.ToolStripButton();
             this.toolSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.btnPushAll = new System.Windows.Forms.ToolStripButton();
             this.btnPushAllWithComment = new System.Windows.Forms.ToolStripButton();
+            this.toolSep3 = new System.Windows.Forms.ToolStripSeparator();
             this.btnPullAll = new System.Windows.Forms.ToolStripButton();
-
-            this.topPanel = new System.Windows.Forms.Panel();
-            this.lblProject = new System.Windows.Forms.Label();
-            this.cboProject = new System.Windows.Forms.ComboBox();
 
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.lblLocal = new System.Windows.Forms.Label();
@@ -99,6 +98,9 @@ namespace PushPull
             this.menuAbout.Text = "&About...";
 
             // toolStrip
+            this.lblProjectStrip.Text = "Project:";
+            this.cboProject.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboProject.Size = new System.Drawing.Size(250, 25);
             this.btnRefresh.Text = "Refresh";
             this.btnRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.btnRefresh.ToolTipText = "Refresh - compare local files against GitHub and update the lists";
@@ -112,22 +114,10 @@ namespace PushPull
             this.btnPullAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.btnPullAll.ToolTipText = "Pull - download all new and changed remote files from GitHub to local";
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.btnRefresh, this.toolSep1,
+                this.lblProjectStrip, this.cboProject, this.toolSep1,
+                this.btnRefresh, this.toolSep2,
                 this.btnPushAll, this.btnPushAllWithComment,
-                this.toolSep2, this.btnPullAll });
-
-            // topPanel
-            this.topPanel.Height = 32;
-            this.topPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.topPanel.Padding = new System.Windows.Forms.Padding(4, 4, 4, 0);
-            this.lblProject.Text = "Project:";
-            this.lblProject.AutoSize = true;
-            this.lblProject.Location = new System.Drawing.Point(4, 8);
-            this.cboProject.Location = new System.Drawing.Point(60, 4);
-            this.cboProject.Width = 300;
-            this.cboProject.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.topPanel.Controls.Add(this.lblProject);
-            this.topPanel.Controls.Add(this.cboProject);
+                this.toolSep3, this.btnPullAll });
 
             // splitContainer
             this.splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -200,7 +190,6 @@ namespace PushPull
             this.ClientSize = new System.Drawing.Size(1000, 620);
             this.Text = "PushPull for GitHub";
             this.Controls.Add(this.splitContainer);
-            this.Controls.Add(this.topPanel);
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.menuStrip);
             this.Controls.Add(this.statusStrip);
@@ -230,15 +219,15 @@ namespace PushPull
         private System.Windows.Forms.ToolStripMenuItem menuHelp;
         private System.Windows.Forms.ToolStripMenuItem menuAbout;
         private System.Windows.Forms.ToolStrip toolStrip;
-        private System.Windows.Forms.ToolStripButton btnRefresh;
+        private System.Windows.Forms.ToolStripLabel lblProjectStrip;
+        private System.Windows.Forms.ToolStripComboBox cboProject;
         private System.Windows.Forms.ToolStripSeparator toolSep1;
+        private System.Windows.Forms.ToolStripButton btnRefresh;
         private System.Windows.Forms.ToolStripSeparator toolSep2;
         private System.Windows.Forms.ToolStripButton btnPushAll;
         private System.Windows.Forms.ToolStripButton btnPushAllWithComment;
+        private System.Windows.Forms.ToolStripSeparator toolSep3;
         private System.Windows.Forms.ToolStripButton btnPullAll;
-        private System.Windows.Forms.Panel topPanel;
-        private System.Windows.Forms.Label lblProject;
-        private System.Windows.Forms.ComboBox cboProject;
         private System.Windows.Forms.SplitContainer splitContainer;
         private System.Windows.Forms.Label lblLocal;
         private System.Windows.Forms.ListView listLocal;
