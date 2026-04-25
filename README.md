@@ -15,13 +15,16 @@ Good for: scripts and config files you want backed up offsite, sharing assets be
 - Side-by-side file browser showing local and remote files (inspired by WinSCP)
 - Files grouped by folder, with full relative paths shown for easy navigation
 - Color-coded status: see at a glance which files are newer locally, newer on GitHub, or only exist on one side
-- Push or pull individual files, all changed files, or all files in a folder (right-click)
+- Push or pull all changed files with one click, or right-click to push/pull selected files only
+- Push with a custom commit message using the **Push+** button
+- Auto-selects a newly created project immediately after saving it
 - Local menu: delete selected or all local files (sent to Recycle Bin), open project folder in Explorer
 - Remote menu: delete selected or all remote files, open the repo on GitHub
 - Click column headers to sort by name or date
 - Flexible ignore patterns: wildcards, file extensions, and folder names
 - Restores your last project, window position, and size on startup
 - Single instance: launching a second copy raises the existing window
+- Default repo owner and default ignore patterns configurable in Settings, applied automatically to new projects
 - Command line support for opening a specific project or pushing without a UI
 
 ## Requirements
@@ -43,9 +46,15 @@ No installer. Just download `PushPull.exe` and run it.
 3. Give it a name (e.g. `PushPull`) and select the `repo` scope
 4. Copy the token
 
-### 2. Enter your token
+### 2. Enter your token and defaults
 
-Open PushPull, go to **File > Settings**, paste your token and click **Test Connection** to verify it works.
+Open PushPull, go to **File > Settings** and configure:
+
+| Setting | Description |
+|---|---|
+| GitHub Auth Token | Paste your personal access token; click **Test Connection** to verify |
+| Default Repo Owner | Pre-filled into every new project (your GitHub username or organization) |
+| Default Ignore Patterns | Applied automatically to every new project |
 
 ### 3. Add a project
 
@@ -55,7 +64,7 @@ Go to **File > New Project** and fill in:
 |---|---|
 | Name | A friendly label for this project |
 | Local Folder | The folder on your PC to sync |
-| Owner | Your GitHub username or organisation |
+| Owner | Your GitHub username or organization |
 | Repo | The repository name |
 | Branch | The branch to sync against (e.g. `main`) |
 | Ignore | Files/folders to skip (one per line) |
