@@ -73,7 +73,7 @@ Click **Load Branches** to populate the branch list from GitHub, or just type th
 
 ### 4. Refresh and sync
 
-Click **Refresh** to compare your local folder with the remote repo. Files are color-coded:
+Select your project from the dropdown in the toolbar, then click **Refresh** to compare your local folder with the remote repo. Files are color-coded:
 
 | Color | Meaning |
 |---|---|
@@ -81,17 +81,16 @@ Click **Refresh** to compare your local folder with the remote repo. Files are c
 | Blue | File exists on GitHub but not locally, or remote copy has changed |
 | White | Files are identical |
 
-Use the toolbar buttons to sync:
+The project selector sits in the toolbar. Use the buttons to sync:
 
 | Button | Action |
 |---|---|
 | **Refresh** | Re-compare local and remote |
-| **Push Selected** | Upload files selected in the left pane |
-| **Push All** | Upload all local-only and locally-changed files |
-| **Pull Selected** | Download files selected in the right pane |
-| **Pull All** | Download all remote-only and remotely-changed files |
+| **Push** | Upload all new and changed local files to GitHub |
+| **Push+** | Same as Push, but prompts for a commit message first |
+| **Pull** | Download all new and changed remote files from GitHub |
 
-Right-click any file to get a **Push Folder** or **Pull Folder** option, which syncs all changed files in that folder only.
+Right-click files in either pane to **Push Selected** or **Pull Selected** for just the highlighted items.
 
 ## Local Menu
 
