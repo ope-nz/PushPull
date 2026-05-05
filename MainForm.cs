@@ -54,8 +54,10 @@ namespace PushPull
             menuAbout.Click += (s, e) => MessageBox.Show("PushPull for GitHub\n\n" + System.Diagnostics.FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileVersion + "\n\nby Ope Ltd", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
             contextMenuLocal.Opening += (s, e) => { if (listLocal.SelectedItems.Count == 0) e.Cancel = true; };
             menuPushFolder.Click += (s, e) => PushSelected();
+            menuAddToIgnoreLocal.Click += (s, e) => AddToIgnore(listLocal);
             contextMenuRemote.Opening += (s, e) => { if (listRemote.SelectedItems.Count == 0) e.Cancel = true; };
             menuPullFolder.Click += (s, e) => PullSelected();
+            menuAddToIgnoreRemote.Click += (s, e) => AddToIgnore(listRemote);
             btnRefresh.Click += (s, e) => DoRefresh();
             btnPushAll.Click += (s, e) => PushAll();
             btnPushAllWithComment.Click += (s, e) => PushAllWithComment();
@@ -287,6 +289,30 @@ default: return "";
             RunSync(toSync, push: false);
         }
 
+        void AddToIgnore(ListView lv)
+        {
+            if (_currentProject == null) return;
+            var entries = GetSelectedEntries(lv);
+            if (entries.Count == 0) return;
+
+            int added = 0;
+            foreach (var e in entries)
+            {
+                string name = System.IO.Path.GetFileName(e.RelativePath.Replace('/', '\\'));
+                if (!string.IsNullOrEmpty(name) && !_currentProject.IgnorePatterns.Contains(name))
+                {
+                    _currentProject.IgnorePatterns.Add(name);
+                    added++;
+                }
+            }
+
+            if (added > 0)
+            {
+                ConfigManager.Save(_config);
+                DoRefresh();
+            }
+        }
+
         void DeleteLocalSelected()
         {
             var toDelete = GetSelectedEntries(listLocal).FindAll(e => e.ExistsLocally);
@@ -408,6 +434,7 @@ default: return "";
             SetAllButtons(false);
 
             var message = commitMessage;
+            var errors = new List<string>();
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 foreach (var e in entries)
@@ -429,7 +456,7 @@ default: return "";
                         }
                         done++;
                     }
-                    catch { failed++; }
+                    catch (Exception ex) { errors.Add(e.RelativePath + ":\n" + ex.Message); failed++; }
                 }
 
                 Invoke((Action)(() =>
@@ -437,6 +464,8 @@ default: return "";
                     Cursor = Cursors.Default;
                     SetAllButtons(true);
                     SetStatus(string.Format("{0} complete. {1} OK, {2} failed.", push ? "Push" : "Pull", done, failed));
+                    if (errors.Count > 0)
+                        MessageBox.Show(string.Join("\n\n", errors), push ? "Push Errors" : "Pull Errors", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     DoRefresh();
                 }));
             });
