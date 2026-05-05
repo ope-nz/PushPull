@@ -61,8 +61,12 @@ namespace PushPull
 
             this.contextMenuLocal = new System.Windows.Forms.ContextMenuStrip();
             this.menuPushFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuLocalIgnoreSep = new System.Windows.Forms.ToolStripSeparator();
+            this.menuAddToIgnoreLocal = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuRemote = new System.Windows.Forms.ContextMenuStrip();
             this.menuPullFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuRemoteIgnoreSep = new System.Windows.Forms.ToolStripSeparator();
+            this.menuAddToIgnoreRemote = new System.Windows.Forms.ToolStripMenuItem();
 
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
@@ -145,8 +149,10 @@ namespace PushPull
             this.listLocal.ShowGroups = true;
             this.listLocal.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listLocal.OwnerDraw = false;
-            this.contextMenuLocal.Items.Add(this.menuPushFolder);
+            this.contextMenuLocal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuPushFolder, this.menuLocalIgnoreSep, this.menuAddToIgnoreLocal });
             this.menuPushFolder.Text = "Push Selected";
+            this.menuAddToIgnoreLocal.Text = "Add to Ignore List";
             this.listLocal.ContextMenuStrip = this.contextMenuLocal;
             this.splitContainer.Panel1.Controls.Add(this.listLocal);
             this.splitContainer.Panel1.Controls.Add(this.lblLocal);
@@ -172,8 +178,10 @@ namespace PushPull
             this.listRemote.HideSelection = false;
             this.listRemote.ShowGroups = true;
             this.listRemote.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.contextMenuRemote.Items.Add(this.menuPullFolder);
+            this.contextMenuRemote.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuPullFolder, this.menuRemoteIgnoreSep, this.menuAddToIgnoreRemote });
             this.menuPullFolder.Text = "Pull Selected";
+            this.menuAddToIgnoreRemote.Text = "Add to Ignore List";
             this.listRemote.ContextMenuStrip = this.contextMenuRemote;
             this.splitContainer.Panel2.Controls.Add(this.listRemote);
             this.splitContainer.Panel2.Controls.Add(this.lblRemote);
@@ -243,8 +251,12 @@ namespace PushPull
         private System.Windows.Forms.ColumnHeader colRemoteStatus;
         private System.Windows.Forms.ContextMenuStrip contextMenuLocal;
         private System.Windows.Forms.ToolStripMenuItem menuPushFolder;
+        private System.Windows.Forms.ToolStripSeparator menuLocalIgnoreSep;
+        private System.Windows.Forms.ToolStripMenuItem menuAddToIgnoreLocal;
         private System.Windows.Forms.ContextMenuStrip contextMenuRemote;
         private System.Windows.Forms.ToolStripMenuItem menuPullFolder;
+        private System.Windows.Forms.ToolStripSeparator menuRemoteIgnoreSep;
+        private System.Windows.Forms.ToolStripMenuItem menuAddToIgnoreRemote;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
     }
