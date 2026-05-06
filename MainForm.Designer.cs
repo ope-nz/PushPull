@@ -109,16 +109,20 @@ namespace PushPull
             this.cboProject.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboProject.Size = new System.Drawing.Size(250, 25);
             this.btnRefresh.Text = "Refresh";
-            this.btnRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnRefresh.Image = Icons.Refresh;
+            this.btnRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.btnRefresh.ToolTipText = "Refresh - compare local files against GitHub and update the lists";
             this.btnPushAll.Text = "Push";
-            this.btnPushAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnPushAll.Image = Icons.Push;
+            this.btnPushAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.btnPushAll.ToolTipText = "Push - upload all new and changed local files to GitHub";
             this.btnPushAllWithComment.Text = "Push+";
-            this.btnPushAllWithComment.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnPushAllWithComment.Image = Icons.PushPlus;
+            this.btnPushAllWithComment.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.btnPushAllWithComment.ToolTipText = "Push with Comment - enter a commit message, then upload all new and changed local files to GitHub";
             this.btnPullAll.Text = "Pull";
-            this.btnPullAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnPullAll.Image = Icons.Pull;
+            this.btnPullAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.btnPullAll.ToolTipText = "Pull - download all new and changed remote files from GitHub to local";
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.lblProjectStrip, this.cboProject, this.toolSep1,
