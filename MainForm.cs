@@ -13,6 +13,7 @@ namespace PushPull
         GfdProject _currentProject;
         List<FileEntry> _entries = new List<FileEntry>();
         string _startupProjectName;
+        DateTime _lastRefreshTime;
 
         static readonly Color ColorLocalNewer = Color.FromArgb(200, 255, 200);
         static readonly Color ColorRemoteNewer = Color.FromArgb(200, 220, 255);
@@ -54,9 +55,11 @@ namespace PushPull
             menuAbout.Click += (s, e) => MessageBox.Show("PushPull for GitHub\n\n" + System.Diagnostics.FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileVersion + "\n\nby Ope Ltd", "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
             contextMenuLocal.Opening += (s, e) => { if (listLocal.SelectedItems.Count == 0) e.Cancel = true; };
             menuPushFolder.Click += (s, e) => PushSelected();
+            menuViewDiffLocal.Click += (s, e) => { var entry = GetFocusedEntry(listLocal); if (entry != null) ShowFileDiff(entry); };
             menuAddToIgnoreLocal.Click += (s, e) => AddToIgnore(listLocal);
             contextMenuRemote.Opening += (s, e) => { if (listRemote.SelectedItems.Count == 0) e.Cancel = true; };
             menuPullFolder.Click += (s, e) => PullSelected();
+            menuViewDiffRemote.Click += (s, e) => { var entry = GetFocusedEntry(listRemote); if (entry != null) ShowFileDiff(entry); };
             menuAddToIgnoreRemote.Click += (s, e) => AddToIgnore(listRemote);
             btnRefresh.Click += (s, e) => DoRefresh();
             btnPushAll.Click += (s, e) => PushAll();
@@ -65,6 +68,15 @@ namespace PushPull
             cboProject.SelectedIndexChanged += (s, e) => OnProjectChanged();
             listLocal.ColumnClick += (s, e) => SortList(listLocal, e.Column);
             listRemote.ColumnClick += (s, e) => SortList(listRemote, e.Column);
+            listLocal.DoubleClick += (s, e) => { var entry = GetFocusedEntry(listLocal); if (entry != null) OpenLocalFile(entry); };
+            listRemote.DoubleClick += (s, e) => { var entry = GetFocusedEntry(listRemote); if (entry != null) OpenLocalFile(entry); };
+            this.Activated += (s, e) =>
+            {
+                if (_currentProject == null) return;
+                if (!btnRefresh.Enabled) return;
+                if (DateTime.Now - _lastRefreshTime < TimeSpan.FromSeconds(60)) return;
+                DoRefresh();
+            };
         }
 
         void LoadConfig()
@@ -106,6 +118,7 @@ namespace PushPull
                 lblLocal.Text = "Local: " + _currentProject.LocalFolder;
                 _config.LastProjectName = _currentProject.ToString();
                 ConfigManager.Save(_config);
+                UpdateLastPushedLabel();
                 DoRefresh();
             }
         }
@@ -131,6 +144,7 @@ namespace PushPull
         void DoRefresh()
         {
             if (_currentProject == null) return;
+            _lastRefreshTime = DateTime.Now;
             SetStatus("Fetching remote file list...");
             Cursor = Cursors.WaitCursor;
             btnRefresh.Enabled = false;
@@ -464,11 +478,108 @@ default: return "";
                     Cursor = Cursors.Default;
                     SetAllButtons(true);
                     SetStatus(string.Format("{0} complete. {1} OK, {2} failed.", push ? "Push" : "Pull", done, failed));
+                    if (push && done > 0)
+                    {
+                        project.LastPushed = DateTime.Now;
+                        ConfigManager.Save(_config);
+                        UpdateLastPushedLabel();
+                    }
                     if (errors.Count > 0)
                         MessageBox.Show(string.Join("\n\n", errors), push ? "Push Errors" : "Pull Errors", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     DoRefresh();
                 }));
             });
+        }
+
+        FileEntry GetFocusedEntry(ListView lv)
+        {
+            ListViewItem item = lv.FocusedItem;
+            if (item == null) return null;
+            return item.Tag as FileEntry;
+        }
+
+        void OpenLocalFile(FileEntry entry)
+        {
+            if (entry == null) return;
+            if (!entry.ExistsLocally)
+            {
+                MessageBox.Show("File is not present locally.", "Open File");
+                return;
+            }
+            string localPath = System.IO.Path.Combine(_currentProject.LocalFolder, entry.RelativePath.Replace('/', '\\'));
+            try { System.Diagnostics.Process.Start(localPath); }
+            catch (Exception ex) { MessageBox.Show("Could not open file:\n" + ex.Message, "Open File"); }
+        }
+
+        void ShowFileDiff(FileEntry entry)
+        {
+            var dlg = new DiffDialog();
+            dlg.SetMessage(entry.RelativePath, "Loading...");
+            dlg.Show(this);
+
+            if (!entry.ExistsLocally)
+            {
+                dlg.SetMessage(entry.RelativePath, "File exists on GitHub only. Pull it first to compare.");
+                return;
+            }
+            if (!entry.ExistsRemotely)
+            {
+                dlg.SetMessage(entry.RelativePath, "File is local only. Push it first to compare.");
+                return;
+            }
+
+            var project = _currentProject;
+            var token = _config.Token;
+            string localPath = System.IO.Path.Combine(project.LocalFolder, entry.RelativePath.Replace('/', '\\'));
+            string relPath = entry.RelativePath;
+
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                string error = null;
+                string localText = null;
+                string remoteText = null;
+                bool isBinary = false;
+                try
+                {
+                    byte[] localBytes = System.IO.File.ReadAllBytes(localPath);
+                    byte[] remoteBytes = GitHub.DownloadFile(token, project.Owner, project.Repo, project.Branch, relPath);
+                    if (IsBinaryContent(localBytes) || IsBinaryContent(remoteBytes))
+                        isBinary = true;
+                    else
+                    {
+                        localText = System.Text.Encoding.UTF8.GetString(localBytes);
+                        remoteText = System.Text.Encoding.UTF8.GetString(remoteBytes);
+                    }
+                }
+                catch (Exception ex) { error = ex.Message; }
+
+                Invoke((Action)(() =>
+                {
+                    if (dlg.IsDisposed) return;
+                    if (error != null)
+                        dlg.SetMessage(relPath, "Error loading file:\n" + error);
+                    else if (isBinary)
+                        dlg.SetMessage(relPath, "Binary file - diff not available.");
+                    else
+                        dlg.SetDiff(relPath, localText, remoteText);
+                }));
+            });
+        }
+
+        static bool IsBinaryContent(byte[] bytes)
+        {
+            int limit = Math.Min(bytes.Length, 8000);
+            for (int i = 0; i < limit; i++)
+                if (bytes[i] == 0) return true;
+            return false;
+        }
+
+        void UpdateLastPushedLabel()
+        {
+            if (_currentProject == null || _currentProject.LastPushed == DateTime.MinValue)
+                statusLastPushed.Text = "";
+            else
+                statusLastPushed.Text = "Last pushed: " + _currentProject.LastPushed.ToString("yyyy-MM-dd HH:mm");
         }
 
         void SetAllButtons(bool enabled)
