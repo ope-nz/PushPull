@@ -13,6 +13,7 @@ namespace PushPull
         public string Repo { get; set; }
         public string Branch { get; set; }
         public List<string> IgnorePatterns { get; set; }
+        public DateTime LastPushed { get; set; }
 
         public GfdProject()
         {
