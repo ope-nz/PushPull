@@ -61,15 +61,18 @@ namespace PushPull
 
             this.contextMenuLocal = new System.Windows.Forms.ContextMenuStrip();
             this.menuPushFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuViewDiffLocal = new System.Windows.Forms.ToolStripMenuItem();
             this.menuLocalIgnoreSep = new System.Windows.Forms.ToolStripSeparator();
             this.menuAddToIgnoreLocal = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuRemote = new System.Windows.Forms.ContextMenuStrip();
             this.menuPullFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuViewDiffRemote = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRemoteIgnoreSep = new System.Windows.Forms.ToolStripSeparator();
             this.menuAddToIgnoreRemote = new System.Windows.Forms.ToolStripMenuItem();
 
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusLastPushed = new System.Windows.Forms.ToolStripStatusLabel();
 
             // menuStrip
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -150,8 +153,9 @@ namespace PushPull
             this.listLocal.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listLocal.OwnerDraw = false;
             this.contextMenuLocal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.menuPushFolder, this.menuLocalIgnoreSep, this.menuAddToIgnoreLocal });
+                this.menuPushFolder, this.menuViewDiffLocal, this.menuLocalIgnoreSep, this.menuAddToIgnoreLocal });
             this.menuPushFolder.Text = "Push Selected";
+            this.menuViewDiffLocal.Text = "View Diff";
             this.menuAddToIgnoreLocal.Text = "Add to Ignore List";
             this.listLocal.ContextMenuStrip = this.contextMenuLocal;
             this.splitContainer.Panel1.Controls.Add(this.listLocal);
@@ -179,18 +183,22 @@ namespace PushPull
             this.listRemote.ShowGroups = true;
             this.listRemote.Dock = System.Windows.Forms.DockStyle.Fill;
             this.contextMenuRemote.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.menuPullFolder, this.menuRemoteIgnoreSep, this.menuAddToIgnoreRemote });
+                this.menuPullFolder, this.menuViewDiffRemote, this.menuRemoteIgnoreSep, this.menuAddToIgnoreRemote });
             this.menuPullFolder.Text = "Pull Selected";
+            this.menuViewDiffRemote.Text = "View Diff";
             this.menuAddToIgnoreRemote.Text = "Add to Ignore List";
             this.listRemote.ContextMenuStrip = this.contextMenuRemote;
             this.splitContainer.Panel2.Controls.Add(this.listRemote);
             this.splitContainer.Panel2.Controls.Add(this.lblRemote);
 
             // statusStrip
-            this.statusStrip.Items.Add(this.statusLabel);
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.statusLabel, this.statusLastPushed });
             this.statusLabel.Text = "Ready";
             this.statusLabel.Spring = true;
             this.statusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.statusLastPushed.Text = "";
+            this.statusLastPushed.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 
             // MainForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -251,13 +259,16 @@ namespace PushPull
         private System.Windows.Forms.ColumnHeader colRemoteStatus;
         private System.Windows.Forms.ContextMenuStrip contextMenuLocal;
         private System.Windows.Forms.ToolStripMenuItem menuPushFolder;
+        private System.Windows.Forms.ToolStripMenuItem menuViewDiffLocal;
         private System.Windows.Forms.ToolStripSeparator menuLocalIgnoreSep;
         private System.Windows.Forms.ToolStripMenuItem menuAddToIgnoreLocal;
         private System.Windows.Forms.ContextMenuStrip contextMenuRemote;
         private System.Windows.Forms.ToolStripMenuItem menuPullFolder;
+        private System.Windows.Forms.ToolStripMenuItem menuViewDiffRemote;
         private System.Windows.Forms.ToolStripSeparator menuRemoteIgnoreSep;
         private System.Windows.Forms.ToolStripMenuItem menuAddToIgnoreRemote;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel statusLastPushed;
     }
 }
