@@ -12,9 +12,9 @@ namespace PushPull
         GfdProject _original;
         public GfdProject Project { get; private set; }
 
-        TextBox txtName, txtFolder, txtOwner, txtRepo, txtIgnore;
-        ComboBox cboBranch;
-        Button btnLoadBranches;
+        TextBox txtName, txtFolder, txtOwner, txtIgnore;
+        ComboBox cboRepo, cboBranch;
+        Button btnLoadRepos, btnLoadBranches;
 
         public ProjectDialog(GfdConfig config, GfdProject existing)
         {
@@ -48,7 +48,16 @@ namespace PushPull
             AddRow("Name:", ref y, lx, tx, lw, tw, out txtName);
             AddFolderRow("Local Folder:", ref y, lx, tx, lw, out txtFolder);
             AddRow("Owner:", ref y, lx, tx, lw, tw, out txtOwner);
-            AddRow("Repo:", ref y, lx, tx, lw, tw, out txtRepo);
+
+            // Repo row - ComboBox + Load Repos button
+            var lblRepo = new Label { Text = "Repo:", Location = new System.Drawing.Point(lx, y + 3), AutoSize = true };
+            cboRepo = new ComboBox { Location = new System.Drawing.Point(tx, y), Width = 200, DropDownStyle = ComboBoxStyle.DropDown };
+            btnLoadRepos = new Button { Text = "Load Repos", Location = new System.Drawing.Point(tx + 210, y - 1), Width = 110 };
+            btnLoadRepos.Click += (s, e) => LoadRepos();
+            this.Controls.Add(lblRepo);
+            this.Controls.Add(cboRepo);
+            this.Controls.Add(btnLoadRepos);
+            y += 32;
 
             var lblBranch = new Label { Text = "Branch:", Location = new System.Drawing.Point(lx, y + 3), AutoSize = true };
             cboBranch = new ComboBox { Location = new System.Drawing.Point(tx, y), Width = 200, DropDownStyle = ComboBoxStyle.DropDown };
@@ -120,17 +129,37 @@ namespace PushPull
             txtName.Text = p.Name ?? "";
             txtFolder.Text = p.LocalFolder ?? "";
             txtOwner.Text = p.Owner ?? "";
-            txtRepo.Text = p.Repo ?? "";
+            cboRepo.Text = p.Repo ?? "";
             cboBranch.Text = p.Branch ?? "main";
             if (p.IgnorePatterns != null)
                 txtIgnore.Text = string.Join("\r\n", p.IgnorePatterns);
+        }
+
+        void LoadRepos()
+        {
+            string token = _config.Token;
+            string owner = txtOwner.Text.Trim();
+            if (string.IsNullOrEmpty(token)) { MessageBox.Show("Set your GitHub token in Settings first."); return; }
+            if (string.IsNullOrEmpty(owner)) { MessageBox.Show("Enter Owner first."); return; }
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                var repos = GitHub.GetRepos(token, owner);
+                if (repos.Count == 0) { MessageBox.Show("No repositories found for '" + owner + "'."); return; }
+                string current = cboRepo.Text;
+                cboRepo.Items.Clear();
+                foreach (var r in repos) cboRepo.Items.Add(r);
+                cboRepo.Text = current;
+            }
+            catch (Exception ex) { MessageBox.Show("Error: " + ex.Message); }
+            finally { Cursor = Cursors.Default; }
         }
 
         void LoadBranches()
         {
             string token = _config.Token;
             string owner = txtOwner.Text.Trim();
-            string repo = txtRepo.Text.Trim();
+            string repo = cboRepo.Text.Trim();
             if (string.IsNullOrEmpty(token)) { MessageBox.Show("Set your GitHub token in Settings first."); return; }
             if (string.IsNullOrEmpty(owner) || string.IsNullOrEmpty(repo)) { MessageBox.Show("Enter Owner and Repo first."); return; }
             Cursor = Cursors.WaitCursor;
@@ -160,7 +189,7 @@ namespace PushPull
                 Name = txtName.Text.Trim(),
                 LocalFolder = txtFolder.Text.Trim(),
                 Owner = txtOwner.Text.Trim(),
-                Repo = txtRepo.Text.Trim(),
+                Repo = cboRepo.Text.Trim(),
                 Branch = cboBranch.Text.Trim(),
                 IgnorePatterns = ignoreLines
             };
