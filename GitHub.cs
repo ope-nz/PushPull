@@ -176,6 +176,28 @@ namespace PushPull
             catch { return false; }
         }
 
+        public static List<string> GetRepos(string token, string owner)
+        {
+            var result = new List<string>();
+            try
+            {
+                var req = MakeRequest(
+                    "https://api.github.com/users/" + owner + "/repos?per_page=100&sort=updated",
+                    "GET", token);
+                var resp = (HttpWebResponse)req.GetResponse();
+                string json = ReadResponse(resp);
+                resp.Close();
+
+                var ser = new JavaScriptSerializer();
+                var repos = ser.Deserialize<List<Dictionary<string, object>>>(json);
+                foreach (var r in repos)
+                    result.Add((string)r["name"]);
+                result.Sort(StringComparer.OrdinalIgnoreCase);
+            }
+            catch { }
+            return result;
+        }
+
         public static List<string> GetBranches(string token, string owner, string repo)
         {
             var result = new List<string>();
