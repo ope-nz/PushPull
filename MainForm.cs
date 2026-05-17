@@ -449,10 +449,16 @@ default: return "";
 
             var message = commitMessage;
             var errors = new List<string>();
+            int total = entries.Count;
             ThreadPool.QueueUserWorkItem(_ =>
             {
+                int i = 0;
                 foreach (var e in entries)
                 {
+                    i++;
+                    int current = i;
+                    Invoke((Action)(() => SetStatus(string.Format("{0} {1} of {2}...",
+                        push ? "Pushing" : "Pulling", current, total))));
                     try
                     {
                         if (push)
