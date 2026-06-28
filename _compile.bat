@@ -19,4 +19,6 @@ for /f "tokens=*" %%v in ('powershell -NoProfile -Command "Get-Date -Format 'yyy
 .\Tools\SetExeFileInfo.exe -action setversion -exe PushPull.exe -version "%BUILD_VERSION%"
 echo Version: %BUILD_VERSION%
 
+copy PushPull.exe C:\Apps\PushPull\PushPull.exe
+
 pause
