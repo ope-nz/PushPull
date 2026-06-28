@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -88,7 +89,8 @@ namespace PushPull
         void RefreshProjectCombo()
         {
             cboProject.Items.Clear();
-            foreach (var p in _config.Projects) cboProject.Items.Add(p);
+            foreach (var p in _config.Projects.OrderBy(p => p.ToString(), StringComparer.OrdinalIgnoreCase))
+                cboProject.Items.Add(p);
 
             // Restore startup project (from CLI arg) or last used project
             int restoreIdx = 0;
