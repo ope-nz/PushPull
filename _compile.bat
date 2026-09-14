@@ -11,9 +11,13 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe ^
   MainForm.Designer.cs MainForm.cs
 echo EXIT CODE: %ERRORLEVEL%
 
+timeout /t 3 /nobreak >nul
 .\Tools\SetExeFileInfo.exe -action setfileinfo -exe PushPull.exe -key "Copyright" -value "Ope Ltd"
+timeout /t 3 /nobreak >nul
 .\Tools\SetExeFileInfo.exe -action setfileinfo -exe PushPull.exe -key "ProductName" -value "PushPull for GitHub"
+timeout /t 3 /nobreak >nul
 .\Tools\SetExeFileInfo.exe -action setfileinfo -exe PushPull.exe -key "LegalCopyright" -value "https://github.com/ope-nz/PushPull"
+timeout /t 3 /nobreak >nul
 
 for /f "tokens=*" %%v in ('powershell -NoProfile -Command "Get-Date -Format 'yyyy.MM.dd.HHmm'"') do set BUILD_VERSION=%%v
 .\Tools\SetExeFileInfo.exe -action setversion -exe PushPull.exe -version "%BUILD_VERSION%"

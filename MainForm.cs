@@ -410,7 +410,23 @@ default: return "";
 
             ThreadPool.QueueUserWorkItem(_ =>
             {
-                foreach (var e in entries)
+                bool batched = false;
+                if (entries.Count > 1)
+                {
+                    // One commit deleting the whole set
+                    try
+                    {
+                        var items = new List<GitHub.BatchChange>();
+                        foreach (var e in entries)
+                            items.Add(new GitHub.BatchChange { RelativePath = e.RelativePath, LocalFullPath = null });
+                        GitHub.PushBatch(token, project.Owner, project.Repo, project.Branch, items, "PushPull delete");
+                        done = entries.Count;
+                        batched = true;
+                    }
+                    catch { } // fall back to one delete per file
+                }
+
+                if (!batched) foreach (var e in entries)
                 {
                     if (GitHub.DeleteFile(token, project.Owner, project.Repo, project.Branch, e.RelativePath, e.RemoteSha))
                         done++;
@@ -454,8 +470,29 @@ default: return "";
             int total = entries.Count;
             ThreadPool.QueueUserWorkItem(_ =>
             {
+                bool batched = false;
+                if (push && entries.Count > 1)
+                {
+                    // One commit for the whole set via the Git Data API
+                    Invoke((Action)(() => SetStatus("Pushing " + total + " file(s) as one commit...")));
+                    try
+                    {
+                        var items = new List<GitHub.BatchChange>();
+                        foreach (var e in entries)
+                            items.Add(new GitHub.BatchChange
+                            {
+                                RelativePath = e.RelativePath,
+                                LocalFullPath = Path.Combine(project.LocalFolder, e.RelativePath.Replace('/', '\\'))
+                            });
+                        GitHub.PushBatch(token, project.Owner, project.Repo, project.Branch, items, message);
+                        done = total;
+                        batched = true;
+                    }
+                    catch { } // batch rejected; fall back to one commit per file
+                }
+
                 int i = 0;
-                foreach (var e in entries)
+                if (!batched) foreach (var e in entries)
                 {
                     i++;
                     int current = i;

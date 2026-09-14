@@ -176,13 +176,105 @@ namespace PushPull
             catch { return false; }
         }
 
+        public class BatchChange
+        {
+            public string RelativePath { get; set; }
+            public string LocalFullPath { get; set; } // null = delete the remote file
+        }
+
+        // Phase 4: one commit for the whole set via the Git Data API:
+        // blobs -> tree (on the tip's base tree) -> commit -> ref update.
+        // Throws on any failure; callers fall back to the per-file Contents loop
+        // (which also handles the empty-repo case this API cannot).
+        public static void PushBatch(string token, string owner, string repo, string branch,
+            List<BatchChange> items, string commitMessage = "PushPull update")
+        {
+            if (items.Count == 0) return;
+            string baseUrl = "https://api.github.com/repos/" + owner + "/" + repo;
+            var ser = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+
+            // Branch tip and its tree
+            var refObj = ser.Deserialize<Dictionary<string, object>>(
+                GetJson(baseUrl + "/git/ref/heads/" + branch, token));
+            string tip = (string)((Dictionary<string, object>)refObj["object"])["sha"];
+
+            var commitObj = ser.Deserialize<Dictionary<string, object>>(
+                GetJson(baseUrl + "/git/commits/" + tip, token));
+            string baseTree = (string)((Dictionary<string, object>)commitObj["tree"])["sha"];
+
+            // One blob per upload; a null sha in a tree entry deletes that path
+            var treeEntries = new List<Dictionary<string, object>>();
+            foreach (var it in items)
+            {
+                string path = it.RelativePath.Replace('\\', '/');
+                if (it.LocalFullPath == null)
+                {
+                    treeEntries.Add(new Dictionary<string, object>
+                    { { "path", path }, { "mode", "100644" }, { "type", "blob" }, { "sha", null } });
+                    continue;
+                }
+                byte[] content = File.ReadAllBytes(it.LocalFullPath);
+                var blobResp = ser.Deserialize<Dictionary<string, object>>(
+                    SendJson(baseUrl + "/git/blobs", "POST", token, ser.Serialize(new Dictionary<string, object>
+                    { { "content", Convert.ToBase64String(content) }, { "encoding", "base64" } })));
+                treeEntries.Add(new Dictionary<string, object>
+                { { "path", path }, { "mode", "100644" }, { "type", "blob" }, { "sha", (string)blobResp["sha"] } });
+            }
+
+            var treeResp = ser.Deserialize<Dictionary<string, object>>(
+                SendJson(baseUrl + "/git/trees", "POST", token, ser.Serialize(new Dictionary<string, object>
+                { { "base_tree", baseTree }, { "tree", treeEntries } })));
+
+            var newCommitResp = ser.Deserialize<Dictionary<string, object>>(
+                SendJson(baseUrl + "/git/commits", "POST", token, ser.Serialize(new Dictionary<string, object>
+                { { "message", commitMessage }, { "tree", (string)treeResp["sha"] }, { "parents", new object[] { tip } } })));
+
+            // Fast-forward the branch; fails if someone pushed meanwhile (caller falls back)
+            SendJson(baseUrl + "/git/refs/heads/" + branch, "PATCH", token, ser.Serialize(new Dictionary<string, object>
+            { { "sha", (string)newCommitResp["sha"] } }));
+        }
+
+        static string GetJson(string url, string token)
+        {
+            var req = MakeRequest(url, "GET", token);
+            var resp = (HttpWebResponse)req.GetResponse();
+            string json = ReadResponse(resp);
+            resp.Close();
+            return json;
+        }
+
+        static string SendJson(string url, string method, string token, string body)
+        {
+            var req = MakeRequest(url, method, token);
+            req.ContentType = "application/json";
+            using (var sw = new StreamWriter(req.GetRequestStream()))
+                sw.Write(body);
+            try
+            {
+                var resp = (HttpWebResponse)req.GetResponse();
+                string json = ReadResponse(resp);
+                resp.Close();
+                return json;
+            }
+            catch (WebException ex)
+            {
+                if (ex.Response != null)
+                {
+                    using (var sr = new StreamReader(ex.Response.GetResponseStream()))
+                        throw new Exception("PushBatch error: " + sr.ReadToEnd(), ex);
+                }
+                throw;
+            }
+        }
+
         public static List<string> GetRepos(string token, string owner)
         {
             var result = new List<string>();
             try
             {
+                // /user/repos includes private repos; /users/{owner}/repos is public-only
                 var req = MakeRequest(
-                    "https://api.github.com/users/" + owner + "/repos?per_page=100&sort=updated",
+                    "https://api.github.com/user/repos?per_page=100&sort=updated",
                     "GET", token);
                 var resp = (HttpWebResponse)req.GetResponse();
                 string json = ReadResponse(resp);
@@ -191,7 +283,27 @@ namespace PushPull
                 var ser = new JavaScriptSerializer();
                 var repos = ser.Deserialize<List<Dictionary<string, object>>>(json);
                 foreach (var r in repos)
-                    result.Add((string)r["name"]);
+                {
+                    var repoOwner = (Dictionary<string, object>)r["owner"];
+                    if (string.Equals((string)repoOwner["login"], owner, StringComparison.OrdinalIgnoreCase))
+                        result.Add((string)r["name"]);
+                }
+
+                // Owner isn't the token's account or one of its orgs; list their public repos
+                if (result.Count == 0)
+                {
+                    var req2 = MakeRequest(
+                        "https://api.github.com/users/" + owner + "/repos?per_page=100&sort=updated",
+                        "GET", token);
+                    var resp2 = (HttpWebResponse)req2.GetResponse();
+                    string json2 = ReadResponse(resp2);
+                    resp2.Close();
+
+                    var repos2 = ser.Deserialize<List<Dictionary<string, object>>>(json2);
+                    foreach (var r in repos2)
+                        result.Add((string)r["name"]);
+                }
+
                 result.Sort(StringComparer.OrdinalIgnoreCase);
             }
             catch { }

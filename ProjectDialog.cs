@@ -130,7 +130,11 @@ namespace PushPull
             txtFolder.Text = p.LocalFolder ?? "";
             txtOwner.Text = p.Owner ?? "";
             cboRepo.Text = p.Repo ?? "";
-            cboBranch.Text = p.Branch ?? "main";
+            // Select the branch as an item: plain Text set here is lost when the handle
+            // is created (the combo re-applies the "main" selection from BuildUI)
+            string branch = string.IsNullOrEmpty(p.Branch) ? "main" : p.Branch;
+            if (!cboBranch.Items.Contains(branch)) cboBranch.Items.Add(branch);
+            cboBranch.SelectedIndex = cboBranch.Items.IndexOf(branch);
             if (p.IgnorePatterns != null)
                 txtIgnore.Text = string.Join("\r\n", p.IgnorePatterns);
         }
@@ -167,9 +171,11 @@ namespace PushPull
             {
                 var branches = GitHub.GetBranches(token, owner, repo);
                 if (branches.Count == 0) { MessageBox.Show("No branches found. The repo may be empty (no commits yet) - just type the branch name, e.g. \"main\"."); return; }
+                string current = cboBranch.Text;
                 cboBranch.Items.Clear();
                 foreach (var b in branches) cboBranch.Items.Add(b);
-                cboBranch.SelectedIndex = 0;
+                if (current.Length > 0) cboBranch.Text = current;
+                else cboBranch.SelectedIndex = 0;
             }
             catch (Exception ex) { MessageBox.Show("Error: " + ex.Message); }
             finally { Cursor = Cursors.Default; }

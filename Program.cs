@@ -126,6 +126,28 @@ namespace PushPull
             Console.WriteLine("Pushing " + toPush.Count + " file(s)...");
             int done = 0, failed = 0;
 
+            if (toPush.Count > 1)
+            {
+                try
+                {
+                    var items = new List<GitHub.BatchChange>();
+                    foreach (var e in toPush)
+                        items.Add(new GitHub.BatchChange
+                        {
+                            RelativePath = e.RelativePath,
+                            LocalFullPath = Path.Combine(project.LocalFolder, e.RelativePath.Replace('/', '\\'))
+                        });
+                    GitHub.PushBatch(config.Token, project.Owner, project.Repo, project.Branch, items, commitMessage);
+                    foreach (var e in toPush) Console.WriteLine("  OK    " + e.RelativePath);
+                    Console.WriteLine(string.Format("Done: {0} pushed in one commit.", toPush.Count));
+                    return 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Batch push failed (" + ex.Message + "); retrying file by file...");
+                }
+            }
+
             foreach (var e in toPush)
             {
                 string localPath = Path.Combine(project.LocalFolder, e.RelativePath.Replace('/', '\\'));

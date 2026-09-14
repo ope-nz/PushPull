@@ -12,6 +12,7 @@ Good for: scripts and config files you want backed up offsite, sharing assets be
 
 - Connect to GitHub using a personal access token (no Git required)
 - Register multiple projects, each linking a local folder to a GitHub repo
+- Repo and branch dropdowns loaded straight from GitHub, private repos included
 - Side-by-side file browser showing local and remote files (inspired by WinSCP)
 - Files grouped by folder, with full relative paths shown for easy navigation
 - Color-coded status: see at a glance which files are newer locally, newer on GitHub, or only exist on one side
@@ -69,7 +70,7 @@ Go to **File > New Project** and fill in:
 | Branch | The branch to sync against (e.g. `main`) |
 | Ignore | Files/folders to skip (one per line) |
 
-Click **Load Branches** to populate the branch list from GitHub, or just type the branch name manually.
+Click **Load Repos** to list the owner's repositories from GitHub (private repos included, as long as your token has access), and **Load Branches** to populate the branch list. Both fields also accept a name typed manually.
 
 ### 4. Refresh and sync
 
